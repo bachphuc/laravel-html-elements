@@ -1,9 +1,10 @@
 {
     "name": "bachphuc/laravel-html-elements",
     "description": "html elements for laravel",
+    "license": "MIT",
     "authors": [
         {
-            "name": "Bach Phuc",
+            "name": "bachphuc",
             "email": "trieuquangphuc123@gmail.com"
         }
     ],
