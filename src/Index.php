@@ -1,6 +1,6 @@
 <?php
 
-namespace backphuc\LaravelHTMLElements;
+namespace bachphuc\LaravelHTMLElements;
 
 class Information{
     public function display(){
