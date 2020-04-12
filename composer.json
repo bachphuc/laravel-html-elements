@@ -1,0 +1,19 @@
+{
+    "name": "bachphuc/laravel-html-elements",
+    "description": "html elements for laravel",
+    "authors": [
+        {
+            "name": "Bach Phuc",
+            "email": "dmobi.dsoft@gmail.com"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "backphuc\\LaravelHTMLElements\\": "src/"
+        },
+        "files": [
+            "src/helpers.php"
+        ]
+    }
+}
