@@ -1,0 +1,1 @@
+<input type="hidden" name="{{isset($name) ? $name : ''}}" value="{{isset($value) ? $value : ''}}" />

@@ -5,6 +5,9 @@
         "backphuc",
         "elements",
         "html",
-        "laravel"
+        "laravel",
+        "matroska",
+        "mimetypes",
+        "quicktime"
     ]
 }
