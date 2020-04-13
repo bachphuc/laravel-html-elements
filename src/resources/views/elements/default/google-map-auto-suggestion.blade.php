@@ -109,5 +109,5 @@
 
 
 @push('scripts')
-<script src="https://maps.googleapis.com/maps/api/js?key={{setting('google_api_key', 'AIzaSyBHpc-bdjPfiOMeVDOzQjCOFtqTxNl0OAY')}}&libraries=places&callback=initAutocomplete&language=vi" async defer></script>
+<script src="https://maps.googleapis.com/maps/api/js?key={{isset($google_api_key) ? $google_api_key : ''}}&libraries=places&callback=initAutocomplete&language=vi" async defer></script>
 @endpush
