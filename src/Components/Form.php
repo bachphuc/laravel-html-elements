@@ -71,7 +71,8 @@ class Form extends BaseElement
                 $element = new $class();
                 $element->setName($key);
                 $ele['name'] = $key;
-                $element->setAttributes($ele);
+                $element->setIsUpdate($this->isUpdate);
+                $element->setAttributes($ele);                
                 $element->setTheme($this->getTheme());
                 $element->setModule($this->getModule());
                 $this->elements[$key] = $element;
@@ -109,7 +110,7 @@ class Form extends BaseElement
         foreach($this->elements as &$ele){
             $name = $ele->getAttribute('name');
             if(isset($data[$name])){
-                $ele->setAttribute('value', $data[$name]);
+                $ele->setValue($data[$name]);
             }
         }
     }
@@ -118,7 +119,7 @@ class Form extends BaseElement
         $this->data[$key] = $value;
         if(!isset($this->elements[$key])) return;
         $ele = $this->elements[$key];
-        $ele->setAttribute('value', $value);
+        $ele->setValue($value);
     }
 
     public function post($data = []){
@@ -138,7 +139,7 @@ class Form extends BaseElement
         }
     }
 
-    public function getValidators(){
+    public function getValidators($isUpdate = false){
         $results = [];
         foreach($this->elementsData as $key => $ele){
             if(isset($ele['type']) && $ele['type'] == 'video_input'){
@@ -150,7 +151,7 @@ class Form extends BaseElement
             }
             else{
                 if(isset($ele['validator'])){
-                    $results[$key] = $ele['validator'];
+                    $results[$key] = $isUpdate && isset($ele['validator_update']) ? $ele['validator_update'] : $ele['validator'];
                 }
             }
         }
@@ -163,6 +164,21 @@ class Form extends BaseElement
     }
 
     public function getData(){
+        $result = [];
+        foreach($this->elements as $ele){
+            $name = $ele->getAttribute('name');
+            $value = $ele->getValue();
+            if($ele->getAttribute('leave_if_empty') && empty($value)){
+                // do not pass empty value into this field, should ignore it when update
+            }
+            else{
+                $result[$name] = $value;
+            }
+        }
+        return $result;
+    }
+
+    public function getOriginalData(){
         return $this->data;
     }
 
@@ -178,7 +194,7 @@ class Form extends BaseElement
         $data = $this->getData();
         $request = request();
         if(!empty($data)){
-            $modelClass = BaseElement::getModelClass($this->model);
+            $modelClass = model_class($this->model);
             if(!$this->item){
                 // create new item
                 if(isset($this->elementsData['user'])){

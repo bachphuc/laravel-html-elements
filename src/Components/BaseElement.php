@@ -13,6 +13,12 @@ class BaseElement
     protected $module = '';
     protected $name = '';
 
+    protected $isUpdate = false;
+
+    public function setIsUpdate($v){
+        $this->isUpdate = $v;
+    }
+
     public function setTheme($t){
         $this->theme = $t;
     }
@@ -34,6 +40,8 @@ class BaseElement
         if(!empty($this->item) && !isset($data['item'])){
             $data['item'] = $this->item;
         }
+        $data['self'] = $this;
+        $data['theme'] = $this->theme;
         $view = view($this->getViewPath(), $data);
         
         $content = $view->render();
@@ -68,7 +76,7 @@ class BaseElement
         if(!empty($this->module)){
             return $this->module . '::elements.'. $this->theme . '.' . $this->viewPath;
         }
-        return BaseElement::VIEW_BASE_PATH. '::elements.'. $this->theme . '.' . $this->viewPath;
+        return BaseElement::VIEW_BASE_PATH. '::'. $this->theme. '.elements'  . '.' . $this->viewPath;
     }
 
     public function setAttribute($key, $value){
@@ -81,6 +89,11 @@ class BaseElement
 
     public function setAttributes($data){
         $except = ['type'];
+ 
+        if($this->isUpdate && isset($data['validator_update'])){
+            $data['validator'] = $data['validator_update'];
+        }
+
         foreach($data as $key => $value){
             if(!in_array($key, $except)){
                 $this->setAttribute($key, $value);
@@ -88,21 +101,37 @@ class BaseElement
         }
     }
 
+    public function setValue($value){
+        $this->setAttribute('value', $value);
+    }
+
+    public function getValue(){
+        $value = $this->getAttribute('value');
+        if(!empty($value) && is_string($value)){
+            $encode = $this->getAttribute('encode');
+            if($encode === 'bcrypt'){
+                return bcrypt($value);
+            }
+        }
+        
+        return $value;
+    }
+
     public function setValidatorAttribute($value){
         if(!empty($value)){
             $rules = explode('|', $value);
-            $tmps = [];
+            $tmp = [];
             foreach($rules as $rule){
                 if(strpos($rule, ':') === false){
-                    $tmps[$rule] = $rule;
+                    $tmp[$rule] = $rule;
                 }
                 else{
                     $parts = explode(':', $rule);
-                    $tmps[$parts[0]] = $parts[1];
+                    $tmp[$parts[0]] = $parts[1];
                 }
             }
             
-            $this->setAttribute('validators', $tmps);
+            $this->setAttribute('validators', $tmp);
         }
     }
 
