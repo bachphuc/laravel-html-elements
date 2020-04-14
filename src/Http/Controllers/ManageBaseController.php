@@ -20,7 +20,8 @@ class ManageBaseController extends BaseController
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
     protected $viewPath = 'manage.base';
-    protected $models;
+    protected $customViews = [];
+    protected $modelName = '';
     protected $model;
     protected $modelRouteName = '';
     protected $activeMenu;
@@ -30,7 +31,6 @@ class ManageBaseController extends BaseController
     protected $form;
     protected $fields;
     protected $modelClass;
-    protected $searchField;
     protected $searchFields;
 
     protected $editViewPath = '';
@@ -44,6 +44,8 @@ class ManageBaseController extends BaseController
     protected $breadcrumbs = null;
 
     protected $routeParams = [];
+    protected $subjectRouteName = '';
+    protected $subject = null;
     protected $queryParams = [];
     protected $bSearchWithId = false;
 
@@ -56,11 +58,66 @@ class ManageBaseController extends BaseController
 
     protected $isShowCreateButton = true;
 
+    protected $itemDisplayField = '';
+    protected $pageConfig = [];
+    protected $_initialized = false;
+
     public function __construct(){
+        $this->loadConfig($this->pageConfig);
         if(!empty($this->authMiddleware)){
             $this->middleware($this->authMiddleware);
         }
         $this->modelClass = model_class($this->model);
+    }
+
+    public function loadConfig($params = []){
+        if(empty($params)) return;
+        if(isset($params['form'])){
+            $this->formElements = $params['form'];
+        }
+
+        if(isset($params['table'])){
+            $tableConfig = $params['table'];
+            if(isset($tableConfig['fields'])){
+                $this->fields = $tableConfig['fields'];
+            }
+        }
+
+        if(isset($params['auth_middleware'])){
+            $this->authMiddleware = $params['auth_middleware'];
+        }
+
+        if(isset($params['model_route_name'])){
+            $this->modelRouteName = $params['model_route_name'];
+        }
+
+        if(isset($params['model'])){
+            $this->model = $params['model'];
+        }
+
+        if(isset($params['active_menu'])){
+            $this->activeMenu = $params['active_menu'];
+        }
+
+        if(isset($params['search_fields'])){
+            $this->searchFields = $params['search_fields'];
+        }
+
+        if(isset($params['model_name'])){
+            $this->modelName = $params['model_name'];
+        }
+
+        if(isset($params['item_display_field'])){
+            $this->itemDisplayField = $params['item_display_field'];
+        }
+
+        if(isset($params['custom_views'])){
+            $this->customViews = $params['custom_views'];
+        }
+
+        if(isset($params['breadcrumbs'])){
+            $this->breadcrumbs = $params['breadcrumbs'];
+        }
     }
 
     public function initFormInput($isUpdate = false){
@@ -77,7 +134,27 @@ class ManageBaseController extends BaseController
     }
 
     public function init(){
-
+        if($this->_initialized) return;
+        $this->_initialized = true;
+        if(empty($this->subjectRouteName)){
+            $this->subjectRouteName = $this->model;
+        }
+        $request = request();
+        $params = $request->route()->parameters();
+        foreach($params as $key => $value){
+            $class = model_class($key);
+            if($class){
+                $item = $class::find($value);
+                if($item){
+                    if(!empty($this->subjectRouteName) && $this->subjectRouteName == $key){
+                        $this->subject = $item;
+                    }
+                    else{
+                        $this->routeParams[$key] = $item;
+                    }
+                }
+            }
+        }
     }
 
     public function getId($id){
@@ -85,6 +162,7 @@ class ManageBaseController extends BaseController
     }
 
     public function getItem($id){
+        if($this->subject) return $this->subject;
         $item = $this->modelClass::findOrFail($id);
         $this->subject = $item;
         return $item;
@@ -109,7 +187,7 @@ class ManageBaseController extends BaseController
 
         $query = $modelClass::orderBy('created_at', 'DESC');
 
-        if($request->query('keyword') && !empty($this->searchField)){
+        if($request->query('keyword') && !empty($this->searchFields)){
             $keyword = $request->query('keyword');
             $this->queryParams['keyword'] = $request->query('keyword');
 
@@ -135,7 +213,6 @@ class ManageBaseController extends BaseController
             
             if(!$this->bSearchWithId && !$bSpecialSearch){
                 $query->where(function($query) use($keyword){
-                    $query->orWhere($this->searchField, 'LIKE', '%' .$keyword . '%');
                     if(!empty($this->searchFields)){
                         foreach($this->searchFields as $field){
                             $query->orWhere($field, 'LIKE', '%' .$keyword . '%');
@@ -160,7 +237,8 @@ class ManageBaseController extends BaseController
 
         $table = Table::create([
             'items' => $items,
-            'models' => $this->models,
+            'modelName' => $this->modelName,
+            'model' => $this->model,
             'item_title' => trans('lang.' . $this->model),
             'fields' => $this->fields,
             'show_action_buttons' => true,
@@ -168,24 +246,30 @@ class ManageBaseController extends BaseController
             'params' => $this->queryParams,
             'theme' => $this->theme,
             'model_route_name' => $this->modelRouteName,
+            'route_params' => $this->routeParams
         ]);
+
+        // set custom action in table
+        if(isset($this->pageConfig['table']['custom_actions'])){
+            $table->setCustomAction($this->pageConfig['table']['custom_actions']);
+        }
 
         $this->processTable($table);
 
         $this->createModelUrl = $this->resolveItemUrl(null, 'create', $this->routeParams);
 
-        return view($this->getModelView('index'), [
+        return view($this->getView('index'), [
             "items" => $items,
             "model" => $this->model,
-            "models" => $this->models,
+            "modelName" => $this->modelName,
             "params" => $this->queryParams,
             "table" => $table,
-            'searchField' => $this->searchField,
             'breadcrumbs' => $this->breadcrumbs,
             'rootRoute' => $this->rootRoute,
             'createModelUrl' => $this->createModelUrl,
             'isShowCreateButton' => $this->isShowCreateButton,
-            'layout' => $this->layout
+            'layout' => $this->layout,
+            'searchFields' => $this->searchFields
         ]);
     }
 
@@ -215,11 +299,12 @@ class ManageBaseController extends BaseController
         $this->form->setAttribute('action', $this->resolveItemUrl(null, 'index', $this->routeParams));
         $this->form->post();
 
-        return view($this->getModelView('create'), [
-            "models" => $this->models,
+        return view($this->getView('create'), [
+            "modelName" => $this->modelName,
             "form" => $this->form,
             'breadcrumbs' => $this->breadcrumbs,
-            'layout' => $this->layout
+            'layout' => $this->layout,
+            'model' => $this->model
         ]);
     }
 
@@ -294,8 +379,18 @@ class ManageBaseController extends BaseController
      * @param  \App\Models\ModelBase  $item
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
-    {
+    public function show($id){
+        $this->init();
+        if(isset($this->customViews['show'])){
+            return view($this->getView('show') , [
+                "modelName" => $this->modelName,
+                'breadcrumbs' => $this->breadcrumbs,
+                'self' => $this,
+                'layout' => $this->layout,
+                'model' => $this->model,
+                'subject' => $this->subject
+            ]);
+        }
         return $this->edit($id);
     }
 
@@ -303,6 +398,9 @@ class ManageBaseController extends BaseController
         if($action === 'title'){
             if(method_exists($item, 'getTitle')){
                 return $item->getTitle();
+            }
+            else if(!empty($this->itemDisplayField)){
+                return $item->{$this->itemDisplayField};
             }
         }
         else if($action === 'href'){
@@ -316,6 +414,9 @@ class ManageBaseController extends BaseController
 
     public function resolveItemUrl($item, $action, $params = []){
         if(!empty($this->modelRouteName)){
+            if(empty($params) && !empty($this->routeParams)){
+                $params = $this->routeParams;
+            }
             $route = $this->modelRouteName . '.' . $action;
             if(\Route::has($route)){
                 if($item){
@@ -355,20 +456,22 @@ class ManageBaseController extends BaseController
 
         $this->form->post();
 
-        $viewPath = !empty($this->editViewPath) ? $this->editViewPath : $this->getModelView('edit');
-        return view($viewPath , [
-            "models" => $this->models,
+        return view($this->getView('edit') , [
+            "modelName" => $this->modelName,
             "item" => $item,
             "form" => $this->form,
             'breadcrumbs' => $this->breadcrumbs,
             'self' => $this,
-            'layout' => $this->layout
+            'layout' => $this->layout,
+            'model' => $this->model
         ]);
     }
 
-    public function getModelView($path){
-        $folderPath = empty($this->viewPath) ? $this->models : $this->viewPath;
-        return BaseElement::VIEW_BASE_PATH . '::' . $this->theme . '.' . $folderPath .'.' . $path;
+    public function getView($path){
+        if(isset($this->customViews[$path])){
+            return $this->customViews[$path];
+        }
+        return BaseElement::VIEW_BASE_PATH . '::' . $this->theme . '.' . $this->viewPath .'.' . $path;
     }
 
     public function customUpdateValidators(Request $request, $item){

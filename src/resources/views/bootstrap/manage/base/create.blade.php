@@ -14,7 +14,7 @@
 			@endif
 			<div class="card">
 				<div class="card-header" data-background-color="purple">
-                    <h4 class="title">{{isset($title) ? $title : (isset($models) ? 'Create ' .ucfirst($models) : '') }}</h4>
+                    <h4 class="title">@lang('lang.create_new_item', ['name' => strtolower($modelName ? $modelName : $model)])</h4>
                     @if(isset($sub_title) && !empty($sub_title))<p class="category">{{$sub_title}}</p>@endif
 				</div>
 				<div class="card-content card-body">

@@ -147,7 +147,11 @@
                                 @if(isset($action['render']))
                                 {!! $action['render']($item) !!}
                                 @else
-                                <a  rel="tooltip" title="{{isset($action['tooltip']) ? $action['tooltip'] : ''}}" class="btn btn-simple btn-xs btn-{{$actionType}}" href="{{route($action['route'] , ['id' => $item->id])}}">{!! $action['title'] !!}</a>
+                                    @if(isset($action['route']))
+                                    <a  rel="tooltip" title="{{isset($action['tooltip']) ? $action['tooltip'] : ''}}" class="btn btn-simple btn-xs btn-{{$actionType}}" href="{{route($action['route'] , ['id' => $item->id])}}">{!! $action['title'] !!}</a>
+                                    @elseif(isset($action['url']))
+                                    <a  rel="tooltip" title="{{isset($action['tooltip']) ? $action['tooltip'] : ''}}" class="btn btn-simple btn-xs btn-{{$actionType}}" href="{{$action['url']}}">{!! $action['title'] !!}</a>
+                                    @endif
                                 @endif
                             @endif
                         @endforeach

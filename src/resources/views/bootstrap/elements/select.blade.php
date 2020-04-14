@@ -29,6 +29,9 @@
                             if(method_exists($item, 'getId')){
                                 $id = $item->getId();
                             }
+                            else {
+                                $id = $item->id;
+                            }
 
                         @endphp
                         <option {{$value == $id ? 'selected' : ''}} value="{{$id}}">{{$itemTitle}}</option>

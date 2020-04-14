@@ -50,6 +50,12 @@ class Table extends BaseElement
         if(!empty($this->modelRouteName)){
             $route = $this->modelRouteName . '.' . $action;
             if(\Route::has($route)){
+                if(empty($params)){
+                    $routeParams = $this->getAttribute('route_params');
+                    if(!empty($routeParams)){
+                        $params = $routeParams;
+                    }
+                }
                 $params['id'] = $item->id;
                 return route($route, $params);
             }
@@ -77,6 +83,10 @@ class Table extends BaseElement
 
         if(isset($params['item_title'])){
             $table->setAttribute('item_title' , $params['item_title']);
+        }
+
+        if(isset($params['route_params'])){
+            $table->setAttribute('route_params' , $params['route_params']);
         }
 
         if(isset($params['fields'])){

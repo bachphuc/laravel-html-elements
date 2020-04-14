@@ -14,8 +14,8 @@
 			@endif
 			<div class="card">
 				<div class="card-header" data-background-color="purple">
-                    <h4 class="title">Edit {{ucfirst($models)}}</h4>
-                    <p class="category"><a href="{{$self->resolveItemUrl($item, 'href')}}" target="_blank">{{$self->resolveItemAction($item, 'title')}}</a> </p>
+                    <h4 class="title">@lang('lang.edit_item', ['name' => $modelName ? $modelName : $model])</h4>
+                    <p class="category"><a href="{{$self->resolveItemUrl($item, 'edit')}}">#{{$item->id}} {{$self->resolveItemAction($item, 'title')}}</a> </p>
 				</div>
 				<div class="card-content card-body">
 					{!! $form->render() !!}
