@@ -5,7 +5,7 @@ namespace bachphuc\LaravelHTMLElements\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Schema;
 
-use bachphuc\LaravelHTMLElements\Components\BaseElement;
+use bachphuc\LaravelHTMLElements\Commands\ManageCommand;
 
 class PackageServiceProvider extends ServiceProvider
 {
@@ -16,7 +16,35 @@ class PackageServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                ManageCommand::class,
+            ]);
+        }
+        $packagePath = dirname(__DIR__);
+      
+        $this->publishes([
+            $packagePath . '/Config/elements.php' => config_path('elements.php'),
+        ], 'elements-config');
+
+        // boot translator
+        $this->loadTranslationsFrom($packagePath . '/resources/lang' , 'elements');
+
+        // publish translator
+        $this->publishes([
+            $packagePath . '/resources/lang' => resource_path('lang/vendor/elements'),
+        ], 'elements-lang');
+
+        // register view
+        $this->loadViewsFrom($packagePath . '/resources/views', 'bachphuc.elements');
+
+        $this->publishes([
+            $packagePath . '/resources/views' => resource_path('views/vendor/elements'),
+        ], 'elements-views');
+
+        $this->publishes([
+            $packagePath . '/public' => public_path('vendor/elements'),
+        ], 'elements-assets');
     }
 
     /**
@@ -30,20 +58,11 @@ class PackageServiceProvider extends ServiceProvider
          * Register the service provider for the dependency.
          */
 
-        // $class = BaseElement::getModelClass(\App\User::class);
-        // var_dump($class);die;
-        // $config = module_namespace(__NAMESPACE__) . '\\Config';
+        $packagePath = dirname(__DIR__);
 
-        // $this->app->register('Modules\\' . $config::MODULE_NAME . '\\App\Providers\RouteServiceProvider');
-
-        // echo dirname(dirname(__FILE__));die;
-        /*
-         * Create aliases for the dependency.
-         */
-        // todo: create alias
-        // $loader = \Illuminate\Foundation\AliasLoader::getInstance();
-        // $loader->alias('Purifier', 'LukeTowers\Purifier\Facades\Purifier');
-        // todo: register view path
-        $this->loadViewsFrom(dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . '/resources/views', 'bachphuc.elements');
+        // register config
+        $this->mergeConfigFrom(
+            $packagePath . DIRECTORY_SEPARATOR . 'Config' . DIRECTORY_SEPARATOR . 'elements.php' , 'elements'
+        );
     }
 }

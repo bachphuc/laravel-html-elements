@@ -16,7 +16,7 @@
                         <div class="col-md-8 action-buttons-panel">
                             <button class="btn btn-trans" onclick="toggleActionsPanel(this)">Show Actions <i class="material-icons">&#xE313;</i></button>
                             @if(isset($isShowCreateButton))
-                            <a class="btn btn-success" href="{{$createUrl}}">@lang('lang.create_new_item', ['name' => strtolower($modelName ? $modelName : $model)])</a>
+                            <a class="btn btn-success" href="{{$createUrl}}">@lang('elements::lang.create_new_item', ['name' => strtolower($modelName ? $modelName : $model)])</a>
                             @endif
                             @if(isset($renderActionButtons))
                                 {!! $renderActionButtons() !!}

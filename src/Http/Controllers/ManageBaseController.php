@@ -61,6 +61,7 @@ class ManageBaseController extends BaseController
     protected $itemDisplayField = '';
     protected $pageConfig = [];
     protected $_initialized = false;
+    protected $menus = [];
 
     public function __construct(){
         $this->loadConfig($this->pageConfig);
@@ -246,7 +247,7 @@ class ManageBaseController extends BaseController
             'params' => $this->queryParams,
             'theme' => $this->theme,
             'model_route_name' => $this->modelRouteName,
-            'route_params' => $this->routeParams
+            'route_params' => $this->routeParams,
         ]);
 
         // set custom action in table
@@ -257,7 +258,7 @@ class ManageBaseController extends BaseController
         $this->processTable($table);
 
         $this->createModelUrl = $this->resolveItemUrl(null, 'create', $this->routeParams);
-
+        
         return view($this->getView('index'), [
             "items" => $items,
             "model" => $this->model,
@@ -269,7 +270,8 @@ class ManageBaseController extends BaseController
             'createModelUrl' => $this->createModelUrl,
             'isShowCreateButton' => $this->isShowCreateButton,
             'layout' => $this->layout,
-            'searchFields' => $this->searchFields
+            'searchFields' => $this->searchFields,
+            'menus' => $this->menus,
         ]);
     }
 
@@ -463,7 +465,8 @@ class ManageBaseController extends BaseController
             'breadcrumbs' => $this->breadcrumbs,
             'self' => $this,
             'layout' => $this->layout,
-            'model' => $this->model
+            'model' => $this->model,
+            'menus' => $this->menus,
         ]);
     }
 

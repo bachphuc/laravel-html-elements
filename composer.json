@@ -20,6 +20,15 @@
     "extra": {
         "branch-alias": {
             "dev-master": "1.0-dev"
+        },
+        "laravel": {
+            "providers": [
+                "bachphuc\\LaravelHTMLElements\\Providers\\PackageServiceProvider"
+            ],
+            "aliases": {
+                "HtmlElements": "bachphuc\\LaravelHTMLElements\\Components"
+            }
         }
-    }
+    },
+    "minimum-stability": "stable"
 }

@@ -177,7 +177,15 @@
     <script>
         function onDeleteItem(id){
             window.currentItem = id;
-            if(!window.bootstrap || !window.bootstrap.Modal){
+            let bHasModalPlugin = false;
+            if(window.bootstrap && window.bootstrap.Modal){
+                bHasModalPlugin = true;
+            }
+            else if(window.$ && typeof ($().modal) === 'function'){
+                bHasModalPlugin = true;
+            }
+
+            if(!bHasModalPlugin){
                 let r = window.confirm('@lang('lang.delete_confirm_message')');
                 if(r === true){
                     deleteItem();
