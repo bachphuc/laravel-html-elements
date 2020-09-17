@@ -224,7 +224,7 @@
 
             r.onload = () => {
                 if(r.readyState === 4){
-                    if(typeof $ !== undefined){
+                    if(window.$ && typeof ($().modal) === 'function'){
                         $('#deleteConfirmModal').modal('hide');
                     }
                     

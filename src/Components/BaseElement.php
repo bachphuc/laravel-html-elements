@@ -5,6 +5,7 @@ namespace bachphuc\LaravelHTMLElements\Components;
 class BaseElement
 {
     const VIEW_BASE_PATH = 'bachphuc.elements';
+    protected $baseViewPath = 'bachphuc.elements';
     protected $viewPath = 'base';
     protected $fullViewPath = '';
     protected $attributes = [];
@@ -49,6 +50,9 @@ class BaseElement
     }
 
     public function getElementClass($model, $module = ''){
+        if(class_exists($model)){
+            return $model;
+        }
         if(empty($module)){
             $modelClass = 'bachphuc\\LaravelHTMLElements\\Components\\' . studly_case($model);
             if(class_exists($modelClass)){
@@ -76,7 +80,7 @@ class BaseElement
         if(!empty($this->module)){
             return $this->module . '::elements.'. $this->theme . '.' . $this->viewPath;
         }
-        return BaseElement::VIEW_BASE_PATH. '::'. $this->theme. '.elements'  . '.' . $this->viewPath;
+        return $this->baseViewPath. '::'. $this->theme. '.elements'  . '.' . $this->viewPath;
     }
 
     public function setAttribute($key, $value){

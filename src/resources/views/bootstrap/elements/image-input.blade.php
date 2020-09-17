@@ -14,12 +14,13 @@
 
 <script>
     if(!window.readURL){
-        window.readURL = function(input, target) {
+        window.readURL = function(input, targetSelector) {
             if (input.files && input.files[0]) {
                 var reader = new FileReader();
 
                 reader.onload = function (e) {
-                    $(target).attr('src', e.target.result);
+                    let target = document.querySelector(targetSelector);
+                    if(target) target.src = e.target.result;
                 }
 
                 reader.readAsDataURL(input.files[0]);
