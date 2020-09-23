@@ -13,8 +13,21 @@ class BaseElement
     protected $theme = 'default';
     protected $module = '';
     protected $name = '';
+    protected $_data = null;
+
+    protected $_type = null;
 
     protected $isUpdate = false;
+
+    protected $defaultAttributes = [];
+
+    public function getType(){
+        return $this->_type;
+    }
+
+    public function getId(){
+        return $this->getAttribute('id');
+    }
 
     public function setIsUpdate($v){
         $this->isUpdate = $v;
@@ -36,13 +49,18 @@ class BaseElement
         return $this->theme;
     }
 
+    public function showWrap($b){
+        $this->setAttribute('show_wrap', $b);
+    }
+
     public function render($params = []){
-        $data = array_merge($this->attributes, $params);
+        $data = array_merge($this->defaultAttributes, $this->attributes, $params);
         if(!empty($this->item) && !isset($data['item'])){
             $data['item'] = $this->item;
         }
         $data['self'] = $this;
         $data['theme'] = $this->theme;
+        $data['showWrap'] = $this->getAttribute('show_wrap', true);
         $view = view($this->getViewPath(), $data);
         
         $content = $view->render();
@@ -92,7 +110,12 @@ class BaseElement
     }
 
     public function setAttributes($data){
+        $this->_data = $data;
         $except = ['type'];
+
+        if(isset($data['type'])){
+            $this->_type = $data['type'];
+        }
  
         if($this->isUpdate && isset($data['validator_update'])){
             $data['validator'] = $data['validator_update'];
@@ -147,6 +170,10 @@ class BaseElement
         $this->name = $name;
     }
 
+    public function hasAttribute($key){
+        return isset($this->attributes[$key]) ? true : false;
+    }
+
     public function getAttribute($key, $default = null){
         if(isset($this->attributes[$key])){
             return $this->attributes[$key];
@@ -168,5 +195,9 @@ class BaseElement
 
     public static function getModelClass($class){
         return model_class($class);
+    }
+
+    public function resetDefaultValue(){
+        
     }
 }

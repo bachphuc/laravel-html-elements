@@ -25,10 +25,12 @@ class ManageBaseController extends BaseController
     protected $model;
     protected $modelRouteName = '';
     protected $activeMenu;
+    protected $modelWiths = [];
 
     protected $formElements;
 
     protected $form;
+    protected $forms;
     protected $fields;
     protected $modelClass;
     protected $searchFields;
@@ -62,6 +64,8 @@ class ManageBaseController extends BaseController
     protected $pageConfig = [];
     protected $_initialized = false;
     protected $menus = [];
+
+    protected $mapModelClasses = [];
 
     public function __construct(){
         $this->loadConfig($this->pageConfig);
@@ -121,15 +125,22 @@ class ManageBaseController extends BaseController
         }
     }
 
+    public function createFormElements($isUpdate = false){
+        return null;
+    }
+
     public function initFormInput($isUpdate = false){
+        $elements = $this->createFormElements($isUpdate);
+        if(!empty($elements)){
+            $this->formElements = $elements;
+        }
         if(!empty($this->formElements)){
             $form = new Form();
             $form->setIsUpdate($isUpdate);
             $form->setModel($this->model);
             $form->hasFile(true);
-            $form->setElements($this->formElements);
-    
             $form->setTheme($this->theme);
+            $form->setElements($this->formElements);
             $this->form = $form;
         }
     }
@@ -143,7 +154,7 @@ class ManageBaseController extends BaseController
         $request = request();
         $params = $request->route()->parameters();
         foreach($params as $key => $value){
-            $class = model_class($key);
+            $class = $this->getModelClass($key);
             if($class){
                 $item = $class::find($value);
                 if($item){
@@ -156,6 +167,17 @@ class ManageBaseController extends BaseController
                 }
             }
         }
+    }
+
+    public function getModelClass($key){
+        $class = model_class($key);
+        if($class) return $class;
+
+        if(isset($this->mapModelClasses[$key])){
+            return model_class($this->mapModelClasses[$key]);
+        }
+
+        return null;
     }
 
     public function getId($id){
@@ -177,6 +199,9 @@ class ManageBaseController extends BaseController
 
     }
     
+    public function createTableFields(){
+        return null;
+    }
 
     public function index(Request $request){
         $this->init();
@@ -186,7 +211,7 @@ class ManageBaseController extends BaseController
         }
         $this->queryParams = [];
 
-        $query = $modelClass::orderBy('created_at', 'DESC');
+        $query = $modelClass::with($this->modelWiths);
 
         if($request->query('keyword') && !empty($this->searchFields)){
             $keyword = $request->query('keyword');
@@ -236,6 +261,11 @@ class ManageBaseController extends BaseController
             $items = $query->orderBy('id', 'desc')->get();
         }
 
+        $tableFields = $this->createTableFields();
+        if($tableFields){
+            $this->fields = $tableFields;
+        }
+
         $table = Table::create([
             'items' => $items,
             'modelName' => $this->modelName,
@@ -256,7 +286,7 @@ class ManageBaseController extends BaseController
         }
 
         $this->processTable($table);
-
+        
         $this->createModelUrl = $this->resolveItemUrl(null, 'create', $this->routeParams);
         
         return view($this->getView('index'), [
@@ -265,14 +295,23 @@ class ManageBaseController extends BaseController
             "modelName" => $this->modelName,
             "params" => $this->queryParams,
             "table" => $table,
-            'breadcrumbs' => $this->breadcrumbs,
+            'breadcrumbs' => $this->getBreadcrumbs(),
             'rootRoute' => $this->rootRoute,
             'createModelUrl' => $this->createModelUrl,
             'isShowCreateButton' => $this->isShowCreateButton,
-            'layout' => $this->layout,
+            'layout' => $this->getLayout(),
             'searchFields' => $this->searchFields,
             'menus' => $this->menus,
+            'activeMenu' => $this->activeMenu
         ]);
+    }
+
+    public function getBreadcrumbs(){
+        return $this->breadcrumbs;
+    }
+
+    public function getLayout(){
+        return $this->layout;
     }
 
     public function getActionUrl($action, $routeParams = []){
@@ -304,9 +343,10 @@ class ManageBaseController extends BaseController
         return view($this->getView('create'), [
             "modelName" => $this->modelName,
             "form" => $this->form,
-            'breadcrumbs' => $this->breadcrumbs,
-            'layout' => $this->layout,
-            'model' => $this->model
+            'breadcrumbs' => $this->getBreadcrumbs(),
+            'layout' => $this->getLayout(),
+            'model' => $this->model,
+            'activeMenu' => $this->activeMenu
         ]);
     }
 
@@ -438,6 +478,7 @@ class ManageBaseController extends BaseController
      */
     public function edit($id)
     {
+        $this->forms = [];
         $this->init();
         $this->initFormInput(true);
         $item = $this->getItem($this->getId($id));
@@ -458,16 +499,42 @@ class ManageBaseController extends BaseController
 
         $this->form->post();
 
+        $this->forms[] = [
+            'title' => 'Information',
+            'key' => 'information',
+            'icon' => '',
+            'form' => $this->form
+        ];
+
+        $this->editHook($item);
+
         return view($this->getView('edit') , [
             "modelName" => $this->modelName,
             "item" => $item,
-            "form" => $this->form,
-            'breadcrumbs' => $this->breadcrumbs,
+            "forms" => $this->forms,
+            'breadcrumbs' => $this->getBreadcrumbs(),
             'self' => $this,
-            'layout' => $this->layout,
+            'layout' => $this->getLayout(),
             'model' => $this->model,
             'menus' => $this->menus,
+            'activeMenu' => $this->activeMenu
         ]);
+    }
+
+    public function baseView($path, $data = []){
+        $coreData = [
+            'self' => $this,
+            'layout' => $this->getLayout(),
+            'menus' => $this->menus,
+            'activeMenu' => $this->activeMenu
+        ];
+
+        $viewData = array_merge($coreData, $data);
+        return view($this->getView($path) , $viewData);
+    }
+
+    public function editHook($item){
+
     }
 
     public function getView($path){
@@ -549,6 +616,10 @@ class ManageBaseController extends BaseController
         }
         Session::flash('message', "Delete $this->model successfully.");
         return redirect()->to($this->resolveItemUrl(null, 'index', $this->routeParams));
+    }
+
+    public function getTheme(){
+        return $this->theme;
     }
 
 }

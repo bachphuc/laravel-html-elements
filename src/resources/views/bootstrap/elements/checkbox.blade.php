@@ -5,7 +5,7 @@
             $value = isset($value) ? $value : null;
         @endphp
 
-        <label>{{title_case(isset($title) ? $title : (isset($name) ? $name : ''))}}</label>
+        <label>{{str_title_case(isset($title) ? $title : (isset($name) ? $name : ''))}}</label>
 
         <div class="checkbox">
             <label>

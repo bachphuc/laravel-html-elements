@@ -14,8 +14,8 @@
 			@endif
 			<div class="card {{count($forms) > 1 ? 'card-nav-tabs' : ''}}">
 				<div class="card-header" data-background-color="purple">
-                    <h4 class="title">@lang('lang.edit_item', ['name' => $modelName ? $modelName : $model])</h4>
-					<p class="category"><a href="{{$self->resolveItemUrl($item, 'edit')}}">#{{$item->id}} {{$self->resolveItemAction($item, 'title')}}</a> </p>
+                    @if(isset($title))<h4 class="title">{{$title}}</h4>@endif
+					@if(isset($subTitle))<p class="category">{{$subTitle}}</p>@endif
 					
 					@if(count($forms) > 1)
 					<div class="nav-tabs-navigation" style="margin-top: 32px;">

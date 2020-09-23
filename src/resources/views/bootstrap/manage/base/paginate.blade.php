@@ -1,3 +1,4 @@
+@if(isset($items) && $items && method_exists($items, 'total'))
 <div class="paginate">
     <div class="paginate-total">
         @lang('elements::lang.paginate_text', ['length' => $items->count(), 'total' => $items->total(), 'type' => isset($item_type) ? $item_type : trans('lang.object_s')])
@@ -11,3 +12,4 @@
     </div>
     <div class="clear"></div>
 </div>
+@endif

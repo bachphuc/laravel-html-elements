@@ -1,0 +1,1 @@
+<{{$tag}} type="{{$type}}" class="btn {{$class}}" {!! $tag === 'a' ? 'href="'. $href .'"' : '' !!}>{{$title}}</{{$tag}}>

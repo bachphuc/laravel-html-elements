@@ -21,13 +21,17 @@
                 @elseif($dataType == 'array')
                     @foreach($items as $item)
                     <div>
+                        @php
+                            $v = is_array($item) ? $item['value'] : $item;
+                            $t = is_array($item) ? $item['title'] : $item;
+                        @endphp
                         <div class="checkbox">
                             <label>
-                                <input name="{{isset($name) ? $name : ''}}[]" value="{{$item['value']}}" id="{{isset($name) ? $name : ''}}-control-item-{{$item['value']}}" type="checkbox" {{in_array($item['value'], $checked) ? 'checked' : ''}} />
+                                <input name="{{isset($name) ? $name : ''}}[]" value="{{$v}}" id="{{isset($name) ? $name : ''}}-control-item-{{$v}}" type="checkbox" {{in_array($v, $checked) ? 'checked' : ''}} />
                             </label>
                         </div>
-                        @if(isset($item['color']))<label for="{{isset($name) ? $name : ''}}-control-item-{{$item['value']}}" class="color" style="background-color: {{$item['color']}};"></label>@endif
-                        <label for="{{isset($name) ? $name : ''}}-control-item-{{$item['value']}}">{{$item['title']}}</label>
+                        @if(isset($item['color']))<label for="{{isset($name) ? $name : ''}}-control-item-{{$v}}" class="color" style="background-color: {{$item['color']}};"></label>@endif
+                        <label for="{{isset($name) ? $name : ''}}-control-item-{{$v}}">{{$t}}</label>
                     </div>
                     @endforeach
                 @endif

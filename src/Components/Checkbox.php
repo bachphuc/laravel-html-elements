@@ -15,4 +15,9 @@ class Checkbox extends BaseElement
             $data[$name] = $uncheckValue;
         }
     }
+
+    public function resetDefaultValue(){
+        $uncheckValue = $this->getAttribute('uncheck_value', 0);
+        $this->setValue($uncheckValue);
+    }
 }

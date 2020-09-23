@@ -37,6 +37,10 @@ class Form extends BaseElement
         $this->setAttribute('renderActionButtons', $render);
     }
 
+    public function setChildrenAttribute($data){
+        $this->setElements($data);
+    }
+
     public function setElements($data){
         // set element data
         $this->elementsData = $data;
@@ -45,8 +49,16 @@ class Form extends BaseElement
         // init elements
         
         foreach($this->elementsData as $k => $tmp){
+            $bContinue = false;
             if(!is_numeric($k) && in_array($k, $this->specialFields)){
-                continue;
+                if($k === 'alias' && is_array($tmp)){
+                    if(isset($tmp['allow_edit']) && $tmp['allow_edit']){
+                        $bContinue = true;
+                    }
+                }
+                if(!$bContinue){
+                    continue;
+                }
             }
             $key = is_array($tmp) ? $k : $tmp;
             $ele = is_array($tmp) ? $tmp : [
@@ -58,7 +70,7 @@ class Form extends BaseElement
                 $ele['type'] = 'text';
             }
             // special field
-            if(!in_array($key, $this->specialFields)){
+            if(!in_array($key, $this->specialFields) || $bContinue){
                 $class = $this->getElementClass($ele['type'], isset($ele['module']) ? $ele['module'] : '');
                 if(empty($class)){
                     if(!isset($ele['module'])){
@@ -71,10 +83,10 @@ class Form extends BaseElement
                 $element = new $class();
                 $element->setName($key);
                 $ele['name'] = $key;
-                $element->setIsUpdate($this->isUpdate);
-                $element->setAttributes($ele);                
                 $element->setTheme($this->getTheme());
                 $element->setModule($this->getModule());
+                $element->setIsUpdate($this->isUpdate);
+                $element->setAttributes($ele);                
                 $this->elements[$key] = $element;
             }
         }
@@ -102,15 +114,29 @@ class Form extends BaseElement
     }
 
     public function populate($data = []){
+        $bFromRequest = false;
         if(empty($data)){
             $request = request();
             $data = $request->all();
+            $bFromRequest = true;
         }
         $this->data = $data;
         foreach($this->elements as &$ele){
             $name = $ele->getAttribute('name');
-            if(isset($data[$name])){
+            if($ele->getType() === 'form_group'){
+                $ele->populate($data, $bFromRequest);
+            }
+            else if(isset($data[$name])){
                 $ele->setValue($data[$name]);
+            }
+            else if($bFromRequest && $request->has($name)){
+                $ele->setValue('');
+            }
+            else if($bFromRequest && $ele->getType() === 'checkbox'){
+                $ele->resetDefaultValue();
+            }
+            else{
+                $ele->resetDefaultValue();
             }
         }
     }
@@ -166,13 +192,21 @@ class Form extends BaseElement
     public function getData(){
         $result = [];
         foreach($this->elements as $ele){
-            $name = $ele->getAttribute('name');
-            $value = $ele->getValue();
-            if($ele->getAttribute('leave_if_empty') && empty($value)){
-                // do not pass empty value into this field, should ignore it when update
+            if($ele->getType() == 'form_group'){
+                $values = $ele->getData();                
+                foreach($values as $k => $name){
+                    $result[$k] = $name;
+                }
             }
             else{
-                $result[$name] = $value;
+                $name = $ele->getAttribute('name');
+                $value = $ele->getValue();
+                if($ele->getAttribute('leave_if_empty') && empty($value)){
+                    // do not pass empty value into this field, should ignore it when update
+                }
+                else{
+                    $result[$name] = $value;
+                }
             }
         }
         return $result;
@@ -208,11 +242,16 @@ class Form extends BaseElement
                 $item = $modelClass::create($data);
 
                 if(isset($this->elementsData['alias'])){
-                    $aliasField = $this->elementsData['alias'];
-                    // $data['alias'] = str_slug($data[$aliasField], '-');
-                    if($item->hasField('alias')){
-                        $item->alias = str_slug($data[$aliasField], '-') . '-'. $item->id;
-                        $item->save();
+                    $aliasOption = $this->elementsData['alias'];
+                    $aliasField = is_array($aliasOption) ? $aliasOption['field'] : $aliasOption;
+                    $bAliasWithId = is_array($aliasOption) ? (isset($aliasOption['with_id']) ? $aliasOption['with_id'] : true) : true;
+                    $separate = is_array($aliasOption) ? (isset($aliasOption['separate']) ? $aliasOption['separate'] : '-') : '-';
+                
+                    if($item->hasField('alias') && isset($data[$aliasField])){
+                        if(empty($item->alias)){
+                            $item->alias = str_slug($data[$aliasField], $separate) . ( $bAliasWithId ? $separate. $item->id : '');
+                            $item->save();
+                        }
                     }
                 }
                 
@@ -257,7 +296,7 @@ class Form extends BaseElement
                 if(isset($data['updated_at'])){
                     unset($data['updated_at']);
                 }
-                
+        
                 foreach($this->elements as $ele){
                     $ele->prepareProcess($item, $data);
                 }

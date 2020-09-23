@@ -6,7 +6,7 @@
                 $validators = isset($validators) ? $validators : [];
                 $inputTitle = title_case(isset($title) ? $title : (isset($name) ? $name : ''));
             @endphp
-            <label>{{str_clean_title($inputTitle)}}</label>
+            <label>{{str_clean_title($inputTitle)}} @if(in_array('required', $validators))<span class="text-danger">*</span> @endif</label>
             <select class="form-control" name="{{isset($name) ? $name : ''}}" {{in_array('required', $validators) ? 'required' : ''}}>
                 <option value="{{isset($default_value) ? $default_value : ''}}">@lang('lang.select') {{str_clean_title($inputTitle)}}</option>
                 @if(isset($dataType) && isset($items) && !empty($items))
