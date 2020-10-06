@@ -5,6 +5,11 @@ class Typography extends BaseElement
 {   
     protected $viewPath = 'typography';
 
+    protected $defaultAttributes = [
+        'class' => '',
+        'id' => ''
+    ];
+
     public function setTextAttribute($text){
         
     }

@@ -56,7 +56,7 @@ class ManageBaseController extends BaseController
     protected $authMiddleware = '';
 
     protected $rootRoute = '';
-    protected $layout = 'layouts.default';
+    protected $layout = 'bachphuc.elements::layouts.admin';
 
     protected $isShowCreateButton = true;
 
@@ -66,6 +66,7 @@ class ManageBaseController extends BaseController
     protected $menus = [];
 
     protected $mapModelClasses = [];
+    protected $colorTheme = 'white';
 
     public function __construct(){
         $this->loadConfig($this->pageConfig);
@@ -203,6 +204,14 @@ class ManageBaseController extends BaseController
         return null;
     }
 
+    public function addQueryParams($key, $value){
+        $this->queryParams[$key] = $value;
+    }
+
+    public function getColorTheme(){
+        return $this->colorTheme;
+    }
+
     public function index(Request $request){
         $this->init();
         $modelClass = model_class($this->model);
@@ -301,9 +310,18 @@ class ManageBaseController extends BaseController
             'isShowCreateButton' => $this->isShowCreateButton,
             'layout' => $this->getLayout(),
             'searchFields' => $this->searchFields,
-            'menus' => $this->menus,
-            'activeMenu' => $this->activeMenu
+            'menus' => $this->getMenus(),
+            'activeMenu' => $this->activeMenu,
+            'colorTheme' => $this->getColorTheme(),
         ]);
+    }
+
+    public function getMenus(){
+        return $this->menus;
+    }
+
+    public function initBreadcrumb(){
+
     }
 
     public function getBreadcrumbs(){
@@ -340,13 +358,22 @@ class ManageBaseController extends BaseController
         $this->form->setAttribute('action', $this->resolveItemUrl(null, 'index', $this->routeParams));
         $this->form->post();
 
+        $this->initBreadcrumb();
+        
+        $this->breadcrumbs[] = [
+            'title' => 'Create',
+            'url' => ''
+        ];
+
         return view($this->getView('create'), [
             "modelName" => $this->modelName,
             "form" => $this->form,
             'breadcrumbs' => $this->getBreadcrumbs(),
             'layout' => $this->getLayout(),
             'model' => $this->model,
-            'activeMenu' => $this->activeMenu
+            'activeMenu' => $this->activeMenu,
+            'menus' => $this->getMenus(),
+            'colorTheme' => $this->getColorTheme(),
         ]);
     }
 
@@ -396,11 +423,14 @@ class ManageBaseController extends BaseController
 
         $itemType = str_replace('_', ' ' , $this->model);
         $message = "Create " . str_clean_title($itemType) . " successfully.";
+
+        $redirectUrl = $this->resolveItemUrl(null, 'index', $this->routeParams);
         if(is_request_json()){
             return [
                 'status' => true,
                 'message' => $message,
-                'item' => $item
+                'item' => $item,
+                'redirect_url' => $redirectUrl
             ];
         }
 
@@ -408,7 +438,7 @@ class ManageBaseController extends BaseController
         if(!empty($this->returnStoreUrl)){
             return redirect()->to($this->returnStoreUrl);
         }
-        return redirect()->to($this->resolveItemUrl(null, 'index', $this->routeParams));
+        return redirect()->to($redirectUrl);
     }
 
     public function afterStore(Request $request, $item, $data){
@@ -482,6 +512,8 @@ class ManageBaseController extends BaseController
         $this->init();
         $this->initFormInput(true);
         $item = $this->getItem($this->getId($id));
+
+        $this->initBreadcrumb();
         
         $this->breadcrumbs[] = [
             'title' => $this->resolveItemAction($item, 'title'),
@@ -516,8 +548,11 @@ class ManageBaseController extends BaseController
             'self' => $this,
             'layout' => $this->getLayout(),
             'model' => $this->model,
-            'menus' => $this->menus,
-            'activeMenu' => $this->activeMenu
+            'menus' => $this->getMenus(),
+            'activeMenu' => $this->activeMenu,
+            'disableGlobalMessage' => true,
+            'menus' => $this->getMenus(),
+            'colorTheme' => $this->getColorTheme(),
         ]);
     }
 
@@ -525,7 +560,7 @@ class ManageBaseController extends BaseController
         $coreData = [
             'self' => $this,
             'layout' => $this->getLayout(),
-            'menus' => $this->menus,
+            'menus' => $this->getMenus(),
             'activeMenu' => $this->activeMenu
         ];
 
@@ -588,7 +623,17 @@ class ManageBaseController extends BaseController
         }
 
         $itemType = str_replace('_', ' ' , $this->model);
-        Session::flash('message', "Update " . str_clean_title($itemType) . " successfully.");
+        $message = "Update " . str_clean_title($itemType) . " successfully.";
+
+        if(is_request_json()){
+            return [
+                'status' => true,
+                'item' => $item,
+                'message' => $message
+            ];
+        }        
+
+        Session::flash('message', $message);
         $this->routeParams['id'] = $item->id;
         return redirect()->to($this->resolveItemUrl(null, 'edit', $this->routeParams));
     }

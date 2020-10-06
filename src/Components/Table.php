@@ -98,7 +98,10 @@ class Table extends BaseElement
         }
         
         $table->showActionButtons(isset($params['show_action_buttons']) ? $params['show_action_buttons'] : false);
-        $table->setTheme(isset($params['theme']) ? $params['theme'] : $this->theme);
+       
+        if(isset($params['theme'])){
+            $table->setTheme($params['theme']);
+        }
         $table->showPaginator(isset($params['show_paginate']) ? $params['show_paginate'] : false);
         if(isset($params['params'])){
             $table->setAttribute('params' , $params['params']);
@@ -109,5 +112,9 @@ class Table extends BaseElement
 
     public function setModelRouteName($name){
         $this->modelRouteName = $name;
+    }
+
+    public function setModel_Route_NameAttribute($name){
+        $this->setModelRouteName($name);
     }
 }

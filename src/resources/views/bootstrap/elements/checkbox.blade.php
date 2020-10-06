@@ -10,6 +10,7 @@
         <div class="checkbox">
             <label>
                 <input type="checkbox" name="{{isset($name) ? $name : ''}}" value="{{$selected}}" {{$value == $selected ? 'checked' : ''}} />
+                {{isset($label) ? $label : ''}}
             </label>
         </div>
     </div>

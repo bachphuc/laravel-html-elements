@@ -21,6 +21,10 @@ class BaseElement
 
     protected $defaultAttributes = [];
 
+    function __construct() {
+        
+    }
+
     public function getType(){
         return $this->_type;
     }
@@ -31,10 +35,16 @@ class BaseElement
 
     public function setIsUpdate($v){
         $this->isUpdate = $v;
+        return $this;
     }
 
     public function setTheme($t){
         $this->theme = $t;
+        $elements = $this->getAttribute('elements', []);
+        foreach($elements as $element){
+            $element->setTheme($this->theme);
+        }
+        return $this;
     }
 
     public function setModule($t){
@@ -54,6 +64,13 @@ class BaseElement
     }
 
     public function render($params = []){
+        $view = $this->view($params);
+        
+        $content = $view->render();
+        return $content;
+    }
+
+    public function view($params = []){
         $data = array_merge($this->defaultAttributes, $this->attributes, $params);
         if(!empty($this->item) && !isset($data['item'])){
             $data['item'] = $this->item;
@@ -61,10 +78,7 @@ class BaseElement
         $data['self'] = $this;
         $data['theme'] = $this->theme;
         $data['showWrap'] = $this->getAttribute('show_wrap', true);
-        $view = view($this->getViewPath(), $data);
-        
-        $content = $view->render();
-        return $content;
+        return view($this->getViewPath(), $data);
     }
 
     public function getElementClass($model, $module = ''){
@@ -89,6 +103,7 @@ class BaseElement
 
     public function setViewPath($path){
         $this->viewPath = $path;
+        return $this;
     }
 
     public function getViewPath(){
@@ -99,6 +114,11 @@ class BaseElement
             return $this->module . '::elements.'. $this->theme . '.' . $this->viewPath;
         }
         return $this->baseViewPath. '::'. $this->theme. '.elements'  . '.' . $this->viewPath;
+    }
+
+    public function setFullViewPath($path){
+        $this->fullViewPath = $path;
+        return $this;
     }
 
     public function setAttribute($key, $value){
@@ -120,16 +140,20 @@ class BaseElement
         if($this->isUpdate && isset($data['validator_update'])){
             $data['validator'] = $data['validator_update'];
         }
-
+        
         foreach($data as $key => $value){
             if(!in_array($key, $except)){
                 $this->setAttribute($key, $value);
             }
         }
+
+        return $this;
     }
 
     public function setValue($value){
         $this->setAttribute('value', $value);
+
+        return $this;
     }
 
     public function getValue(){
@@ -199,5 +223,135 @@ class BaseElement
 
     public function resetDefaultValue(){
         
+    }
+
+    public function parse($str){
+        // {type}->attribute:value,
+        // typography->tag:h1;text:hello
+
+        if(strpos($str, '->') === false) return null;
+        $tmp = explode('->', $str);
+        $type = $tmp[0];
+        $strAttributes = $tmp[1];
+        
+        $class = $this->getElementClass($type);
+        if(!$class) return null;
+
+        $results = [
+            'class' => $class,
+        ];
+
+        $attributes = [
+            'type' => $type
+        ];
+        if(!empty($strAttributes)){
+            $tmp1 = explode(';', $strAttributes);
+            foreach($tmp1 as $strAttribute){
+                $tmp2 = explode(':', $strAttribute);
+                $k = trim(array_shift($tmp2));
+                $v = trim(implode(':', $tmp2));
+                if($v === 'true'){
+                    $v = true;
+                }
+                else if($v === 'false'){
+                    $v = false;
+                }
+                $attributes[$k] = $v;
+            }
+        }
+        
+        $results['attributes'] = $attributes;
+
+        return $results;
+    }
+
+    public function createElement($key, $data, $params = []){
+        $class = null;
+        $ele = [];
+        $name = '';
+        $defaultElement = 'text';
+        if(isset($params['default'])){
+            $defaultElement = $params['default'];
+        }
+
+        // container->attributes => children
+        if(is_string($key) && strpos($key, '->') !== false){
+            $elementInfo = $this->parse($key);
+            if($elementInfo){
+                $class = $elementInfo['class'];
+                $ele = $elementInfo['attributes'];
+                if(!empty($data) && is_array($data)){
+                    $ele['children'] = $data;
+                }
+                
+                if(isset($ele['name'])){
+                    $name = $ele['name'];
+                }
+                $stop = true;
+            }
+        }
+
+        if(!$class){
+            if(is_array($data)){
+                $name = $key;
+                if(isset($data['name']) && !empty($data['name'])){
+                    $name = $data['name'];
+                }
+                $ele = $data;
+                if(isset($data['com']) && !empty($data['com'])){
+                    $elementInfo = $this->parse($data['com']);
+                    if($elementInfo){
+                        unset($data['com']);
+                        $class = $elementInfo['class'];
+                        $ele = array_merge($elementInfo['attributes'], $data);
+                    }
+                }
+            }
+            else{
+                $elementInfo = $this->parse($data);
+                if($elementInfo){
+                    $class = $elementInfo['class'];
+                    $ele = $elementInfo['attributes'];
+                }
+                else{
+                    $name = $data;
+                    // default component type is text
+                    $ele = [
+                        'type' => $defaultElement
+                    ];
+                }
+            }
+        }
+
+        // set default input type text
+        if(!isset($ele['type'])){
+            $ele['type'] = $defaultElement;
+        }
+
+        if(empty($class)){
+            $class = $this->getElementClass($ele['type'], isset($ele['module']) ? $ele['module'] : '');
+        }
+        
+        if(empty($class)){
+            if(!isset($ele['module'])){
+                die('Missing implement App\\Http\\Components\\' . studly_case($ele['type']));
+            }
+            else{
+                die('Missing implement Modules\\' . ucfirst($ele['module']) . '\\App\\Http\\Components\\' . studly_case($ele['type']));
+            }
+        }
+        $element = new $class();
+        $element->setName($name);
+        $ele['name'] = $name;
+        $element->setTheme($this->getTheme());
+        $element->setModule($this->getModule());
+        $element->setIsUpdate($this->isUpdate);
+        $element->setAttributes($ele);              
+
+        return $element;
+    }
+
+    public function getChildren(){
+        return $this->getAttribute('elements', []);
     }
 }

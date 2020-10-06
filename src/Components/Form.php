@@ -61,33 +61,17 @@ class Form extends BaseElement
                 }
             }
             $key = is_array($tmp) ? $k : $tmp;
-            $ele = is_array($tmp) ? $tmp : [
-                'type' => 'text'
-            ];
-
-            // set default input type text
-            if(!isset($ele['type'])){
-                $ele['type'] = 'text';
-            }
+      
             // special field
             if(!in_array($key, $this->specialFields) || $bContinue){
-                $class = $this->getElementClass($ele['type'], isset($ele['module']) ? $ele['module'] : '');
-                if(empty($class)){
-                    if(!isset($ele['module'])){
-                        die('Missing implement App\\Http\\Components\\' . studly_case($ele['type']));
-                    }
-                    else{
-                        die('Missing implement Modules\\' . ucfirst($ele['module']) . '\\App\\Http\\Components\\' . studly_case($ele['type']));
-                    }
+                $element = $this->createElement($k, $tmp);
+                $name = $element->getName();
+                if(!empty($name)){
+                    $this->elements[$name] = $element;
                 }
-                $element = new $class();
-                $element->setName($key);
-                $ele['name'] = $key;
-                $element->setTheme($this->getTheme());
-                $element->setModule($this->getModule());
-                $element->setIsUpdate($this->isUpdate);
-                $element->setAttributes($ele);                
-                $this->elements[$key] = $element;
+                else{
+                    $this->elements[] = $element;
+                }
             }
         }
     }
@@ -97,6 +81,8 @@ class Form extends BaseElement
         foreach($this->elements as &$ele){
             $ele->setTheme($this->getTheme());
         }
+
+        return $this;
     }
 
     public function setModule($m){
@@ -105,6 +91,8 @@ class Form extends BaseElement
         foreach($this->elements as &$ele){
             $ele->setModule($this->getModule());
         }
+
+        return $this;
     }
 
     public function render($params = []){
@@ -113,10 +101,9 @@ class Form extends BaseElement
         return parent::render($params);
     }
 
-    public function populate($data = []){
-        $bFromRequest = false;
+    public function populate($data = [], $bFromRequest = false){
+        $request = request();
         if(empty($data)){
-            $request = request();
             $data = $request->all();
             $bFromRequest = true;
         }
@@ -129,7 +116,7 @@ class Form extends BaseElement
             else if(isset($data[$name])){
                 $ele->setValue($data[$name]);
             }
-            else if($bFromRequest && $request->has($name)){
+            else if($bFromRequest && request()->has($name)){
                 $ele->setValue('');
             }
             else if($bFromRequest && $ele->getType() === 'checkbox'){
@@ -155,7 +142,7 @@ class Form extends BaseElement
                 $data = $request->all();
             }
             
-            $this->populate($data);
+            $this->populate($data, true);
         }
         else{
             $data = $request->old();

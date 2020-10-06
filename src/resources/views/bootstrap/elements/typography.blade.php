@@ -1,3 +1,3 @@
 @if(isset($text))
-<{{$tag}}>{!! $text !!}</{{$tag}}>
+<{{$tag}} {!! $class ? 'class="'. $class .'"' : '' !!} {!! $id ? 'id="'. $id .'"' : '' !!}>{!! $text !!}</{{$tag}}>
 @endif

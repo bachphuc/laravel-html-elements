@@ -40,4 +40,11 @@ class Select extends BaseElement
             $this->setAttribute('dataType', 'array');
         }
     }
+
+    public function resetDefaultValue(){
+        $default = $this->getAttribute('default_value', null);
+        if($default !== null){
+            $this->setValue($default);
+        }
+    }
 }

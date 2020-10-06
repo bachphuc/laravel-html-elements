@@ -6,6 +6,10 @@ use bachphuc\LaravelHTMLElements\Components\TabItem;
 class Tab extends ViewGroup
 {   
     protected $viewPath = 'tab';
+    protected $defaultAttributes = [
+        // nav-pills nav-pills-primary
+        'navClass' => 'nav-tabs',
+    ];
 
     public function setChildrenAttribute($tabs){
         $this->_childrenData = $tabs;
@@ -16,53 +20,43 @@ class Tab extends ViewGroup
         if(!empty($id)){
             $id.='-';
         }
+        $i = 0;
         foreach($tabs as $k => $tmp){
-            $key = is_array($tmp) ? $k : $tmp;
-            $ele = is_array($tmp) ? $tmp : [
-                'type' => 'tab_content'
-            ];
-            if(!isset($ele['type'])){
-                $ele['type'] = 'tab_content';
+            if(strpos($k, ':') !== false){
+                $k = 'tab_content->'. $k;
             }
-            $class = $this->getElementClass($ele['type'], isset($ele['module']) ? $ele['module'] : '');
-            if(empty($class)){
-                if(!isset($ele['module'])){
-                    die('Missing implement App\\Http\\Components\\' . studly_case($ele['type']));
-                }
-                else{
-                    die('Missing implement Modules\\' . ucfirst($ele['module']) . '\\App\\Http\\Components\\' . studly_case($ele['type']));
-                }
+            $element = $this->createElement($k, $tmp, [
+                'default' => 'tab_content'
+            ]);
+
+            $name = $element->getName();
+            if(!$element->getId()){
+                $element->setAttribute('id', $id . 'tab-' . (!empty($name) && is_string($name) ? $name : ($i + 1)) );
             }
-            $element = new $class();
-            $element->setName($key);
-            $ele['name'] = $key;
-            $element->setTheme($this->getTheme());
-            $element->setModule($this->getModule());
-            $element->setIsUpdate($this->isUpdate);
-            if(!isset($ele['id'])){
-                $ele['id'] = $id . 'tab-' . (is_numeric($k) ? $k + 1 : $k);
-            }
-            if($k === 0){
-                $ele['active'] = true;
+            $element->setAttribute('active', $i === 0 ? true : false);
+            
+            if(!empty($name)){
+                $elements[$name] = $element;
             }
             else{
-                $ele['active'] = false;
+                $elements[] = $element;
             }
-            $element->setAttributes($ele);              
-            $element->showWrap(false);  
-            $elements[$key] = $element;
 
             $tabItem = new TabItem();
             $tabItem->setTheme($this->getTheme());
+
             $tabItemParams = [
-                'id' => $ele['id'],
-                'title' => isset($ele['title']) ? $ele['title'] : '',
-                'icon' => isset($ele['icon']) ? $ele['icon'] : '',
-                'active' => $ele['active'],
+                'id' => $element->getId(),
+                'title' => $element->getAttribute('title'),
+                'icon' => $element->getAttribute('icon'),
+                'active' => $element->getAttribute('active'),
             ];
+
             $tabItem->setAttributes($tabItemParams);              
 
             $tabItems[] = $tabItem;
+
+            $i++;
         }
 
         $this->setAttribute('tabItems', $tabItems);

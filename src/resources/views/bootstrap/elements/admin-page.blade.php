@@ -43,7 +43,7 @@
 <body>
     <div class="wrapper">
 		@if(!Auth::guest())
-	    <div class="sidebar" data-active-color="rose" data-background-color="{{isset($colorTheme) ? $colorTheme : 'black'}}" data-color="purple" data-image="{{asset('assets/img/sidebar-1.jpg')}}">
+	    <div class="sidebar" data-active-color="rose" data-background-color="black" data-color="purple" data-image="{{asset('assets/img/sidebar-1.jpg')}}">
 			<!--
 		        Tip 1: You can change the color of the sidebar using: data-color="purple | blue | green | orange | red"
 
@@ -112,17 +112,26 @@
 			<div class="content">
                 @include('bachphuc.elements::admin.components.breadcrumbs')
 				@if (isset($message))
-				<div class="alert alert-success">{{ $message }}</div>  
-				@endif
-				
-				@if (\Session::has('message') && (!isset($disableGlobalMessage)))
-				<div class="alert alert-success"><i class="material-icons">done</i> {{ session('message') }}</div> 
-				@endif
-
+				<div class="alert alert-success">
+					<ul>
+						<li>{{ $message }}</li>
+					</ul>
+				</div> 
+                @endif
                 @if (\Session::has('error'))
-				<div class="alert alert-danger">{{ session('error') }}</div> 
+				<div class="alert alert-danger">
+					<ul>
+						<li>{{ session('error') }}</li>
+					</ul>
+				</div> 
 				@endif
-                @yield('content')
+                
+                @if(isset($elements) && !empty($elements))
+                    @foreach($elements as $ele)
+                    {!! $ele->render() !!}
+                    @endforeach      
+                @endif
+
 			</div>
 
 			<footer class="footer">

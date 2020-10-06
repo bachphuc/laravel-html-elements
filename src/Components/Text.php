@@ -25,4 +25,11 @@ class Text extends BaseElement
         $this->setAttribute('title', title_case($this->getTitle()));
         return parent::render($params);
     }
+
+    public function resetDefaultValue(){
+        $default = $this->getAttribute('default', null);
+        if($default !== null){
+            $this->setValue($default);
+        }
+    }
 }
