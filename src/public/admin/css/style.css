@@ -307,6 +307,19 @@ table a:hover{
     border-radius: 4px;
 }
 
+.search-form input::-webkit-input-placeholder{
+    color: #eee;
+}
+.search-form input::-ms-input-placeholder{
+    color: #eee;
+}
+.search-form input::-moz-placeholder{
+    color:#eee;
+}
+.search-form input::placeholder { 
+    color: #eee;
+}
+
 .search-icon {
     display: block;
     width: 40px;
@@ -406,9 +419,10 @@ table a:hover{
 }
 
 .label{
-    font-size: 100% !important;
+    font-size: 0.9em;
     font-weight: normal;
     text-decoration: none !important;
+    line-height: 1.4em;
 }
 
 .label-block{
@@ -500,7 +514,9 @@ a.btn{
 a.btn:hover{
     text-decoration: none !important;
 }
-
+select.form-control{
+    padding-left: 8px;
+}
 @media only screen and (max-width: 480px) {
     .main-panel > .content{
         padding: 0px;
