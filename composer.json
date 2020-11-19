@@ -26,7 +26,7 @@
                 "bachphuc\\LaravelHTMLElements\\Providers\\PackageServiceProvider"
             ],
             "aliases": {
-                "HtmlElements": "bachphuc\\LaravelHTMLElements\\Components"
+                "HtmlElement" : "bachphuc\\LaravelHTMLElements\\Facades\\ElementFacade"
             }
         }
     },

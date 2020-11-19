@@ -43,7 +43,7 @@
 <body>
     <div class="wrapper">
 		@if(!Auth::guest())
-	    <div class="sidebar" data-active-color="rose" data-background-color="black" data-color="purple" data-image="{{asset('assets/img/sidebar-1.jpg')}}">
+	    <div class="sidebar" data-active-color="rose" data-background-color="black" data-color="purple" data-image="{{asset('vendor/elements/img/sidebar-1.jpg')}}">
 			<!--
 		        Tip 1: You can change the color of the sidebar using: data-color="purple | blue | green | orange | red"
 

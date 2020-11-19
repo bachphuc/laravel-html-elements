@@ -15,7 +15,7 @@
 
     @include('bachphuc.elements::admin.components.css-headers')
 
-    <script type="text/javascript" src="{{asset('assets/admin/js/components.js')}}"></script>
+    <script type="text/javascript" src="{{asset('vendor/elements/admin/js/components.js')}}"></script>
 
 	{{-- <script type="text/javascript" src="{{asset('js/angular.min.js')}}"></script>
 	<script type="text/javascript" src="{{asset('js/admin/main.js')}}"></script> --}}
@@ -29,7 +29,7 @@
 		window.baseUrl = '{{url('')}}';
     </script>
 
-	<script src="{{asset('assets/tinymce/tinymce.min.js')}}"></script>
+	<script src="{{asset('vendor/elements/tinymce/tinymce.min.js')}}"></script>
 	
 	<style type="text/css">
 		table thead tr th {
@@ -43,7 +43,7 @@
 <body>
     <div class="wrapper">
 		@if(!Auth::guest())
-	    <div class="sidebar" data-active-color="rose" data-background-color="{{isset($colorTheme) ? $colorTheme : 'black'}}" data-color="purple" data-image="{{asset('assets/img/sidebar-1.jpg')}}">
+	    <div class="sidebar" data-active-color="rose" data-background-color="{{isset($colorTheme) ? $colorTheme : 'black'}}" data-color="purple" data-image="{{asset('vendor/elements/img/sidebar-1.jpg')}}">
 			<!--
 		        Tip 1: You can change the color of the sidebar using: data-color="purple | blue | green | orange | red"
 
@@ -148,7 +148,28 @@
     <!-- Modal -->
     
     <!-- modals components -->
-    @stack('modals')
+	@stack('modals')
+	
+	<div class="modal fade" id="page-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-primary modal-lg modal-xl" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="page-modal-title">I'm modal</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body" id="page-modal-content">
+					<p>I'm modal page</p>
+				</div>
+				{{-- <div class="modal-footer">
+					<button type="button" class="btn btn-secondary" onclick="history.back();">@lang('lang.close')</button>
+				</div>
+				<div class="modal-loading"><i class="fa fa-spinner fa-spin fa-3x fa-fw"></i> <span>@lang('lang.processing')...</span></div> --}}
+			</div>
+		</div>
+	</div>
+
     @stack('endbody')
     
     @stack('scripts')

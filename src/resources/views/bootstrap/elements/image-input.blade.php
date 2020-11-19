@@ -4,7 +4,7 @@
             <label>{{title_case(isset($title) ? $title : (isset($name) ? $name : ''))}}</label>
             <div class="form-upload-input">
                 <div>
-                    <img style="max-width: 96px;max-height:96px;" id="preview_image{{isset($name) ? '_' . $name : ''}}" src="{{isset($value) && !empty($value) ? asset($value) : asset('vendor/elements/img/default_image.svg')}}" />
+                    <img style="max-width: 96px;" id="preview_image{{isset($name) ? '_' . $name : ''}}" src="{{isset($value) && !empty($value) ? asset($value) : asset('vendor/elements/img/default_image.svg')}}" />
                     <input onchange="readURL(this, '#preview_image{{isset($name) ? '_' . $name : ''}}')" accept="image/*" type="file" name="{{isset($name) ? $name : 'image'}}" />
                 </div>
             </div>

@@ -2,10 +2,16 @@
 
 namespace bachphuc\LaravelHTMLElements\Components;
 
+use bachphuc\LaravelHTMLElements\Facades\ElementFacade as Element;
+
 class BaseElement
 {
     const VIEW_BASE_PATH = 'bachphuc.elements';
+    // module
     protected $baseViewPath = 'bachphuc.elements';
+    // folder path
+    protected $folderPath = '';
+    // view name
     protected $viewPath = 'base';
     protected $fullViewPath = '';
     protected $attributes = [];
@@ -20,6 +26,7 @@ class BaseElement
     protected $isUpdate = false;
 
     protected $defaultAttributes = [];
+    protected $viewData = [];
 
     function __construct() {
         
@@ -64,13 +71,22 @@ class BaseElement
     }
 
     public function render($params = []){
+        $data = $this->run($params);
+        if(!empty($data)){
+            $this->setAttributes($data);
+        }
+
         $view = $this->view($params);
         
         $content = $view->render();
         return $content;
     }
 
-    public function view($params = []){
+    public function run($params = []){
+        return [];
+    }
+
+    public function view($params = []){        
         $data = array_merge($this->defaultAttributes, $this->attributes, $params);
         if(!empty($this->item) && !isset($data['item'])){
             $data['item'] = $this->item;
@@ -78,10 +94,13 @@ class BaseElement
         $data['self'] = $this;
         $data['theme'] = $this->theme;
         $data['showWrap'] = $this->getAttribute('show_wrap', true);
-        return view($this->getViewPath(), $data);
+
+        $this->viewData = $data;
+
+        return view($this->getViewPath(), $this->viewData);
     }
 
-    public function getElementClass($model, $module = ''){
+    public static function getElementClass($model, $module = ''){
         if(class_exists($model)){
             return $model;
         }
@@ -95,10 +114,27 @@ class BaseElement
         else{
             $modelClass = 'Modules\\' . ucfirst($module) . '\\App\\Http\\Components\\' . studly_case($model);
         }
-        if(!class_exists($modelClass)){
-            return false;
+        if(class_exists($modelClass)){
+            return $modelClass;
         }
-        return $modelClass;
+
+        $modelClass = Element::parse($model);
+        if($modelClass) return $modelClass;
+
+        return false;
+    }
+
+    public static function make($type, $attributes = []){
+        $class = self::getElementClass($type);
+        if(!$class) return null;
+
+        $ele = new $class();
+
+        if(!empty($attributes)){
+            $ele->setAttributes($attributes);
+        }
+
+        return $ele;
     }
 
     public function setViewPath($path){
@@ -112,6 +148,9 @@ class BaseElement
         }
         if(!empty($this->module)){
             return $this->module . '::elements.'. $this->theme . '.' . $this->viewPath;
+        }
+        if(!empty($this->folderPath)){
+            return $this->baseViewPath. '::' . $this->folderPath . '.'  . $this->theme. '.elements'  . '.' . $this->viewPath;
         }
         return $this->baseViewPath. '::'. $this->theme. '.elements'  . '.' . $this->viewPath;
     }
@@ -132,7 +171,7 @@ class BaseElement
     public function setAttributes($data){
         $this->_data = $data;
         $except = ['type'];
-
+        
         if(isset($data['type'])){
             $this->_type = $data['type'];
         }
@@ -234,7 +273,7 @@ class BaseElement
         $type = $tmp[0];
         $strAttributes = $tmp[1];
         
-        $class = $this->getElementClass($type);
+        $class = self::getElementClass($type);
         if(!$class) return null;
 
         $results = [
@@ -329,7 +368,7 @@ class BaseElement
         }
 
         if(empty($class)){
-            $class = $this->getElementClass($ele['type'], isset($ele['module']) ? $ele['module'] : '');
+            $class = self::getElementClass($ele['type'], isset($ele['module']) ? $ele['module'] : '');
         }
         
         if(empty($class)){

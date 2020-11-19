@@ -392,12 +392,25 @@ table a:hover{
     margin-bottom: 0px !important;
 }
 
+body .sidebar-wrapper ul.nav li.active div ul li:not(.active) > a{
+    background-color: transparent !important;
+    box-shadow: none !important;
+}
+
 #menu_item_collapse_shopy{
     margin: 0px !important;
 }
 
 .sidebar-wrapper{
     overflow: hidden !important;
+}
+
+.sidebar-wrapper ul.nav li div > ul.nav {
+    margin-left: 16px;
+}
+
+.sidebar[data-background-color='white'] .sidebar-wrapper ul.nav > li.active > a.nav-link{
+    color: #fff !important;
 }
 
 .fake-scroller{
@@ -460,6 +473,7 @@ table .label{
     display: inline-block;
     vertical-align: middle;
     margin-bottom: 4px;
+    margin-right: 8px;
 }
 .gallery-item > span {
     position: absolute;
@@ -516,6 +530,10 @@ a.btn:hover{
 }
 select.form-control{
     padding-left: 8px;
+}
+
+[data-notify='container']{
+    z-index: 1100 !important;
 }
 @media only screen and (max-width: 480px) {
     .main-panel > .content{

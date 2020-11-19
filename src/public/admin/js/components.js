@@ -1,4 +1,4 @@
-function Api() {
+function ApiService() {
     this.get = function (apiUrl) {
         return new Promise((resolve, reject) => {
             const xhr = new XMLHttpRequest();
@@ -8,9 +8,31 @@ function Api() {
             xhr.send();
         });
     }
+
+    this.fetchPage = function(url){
+        return new Promise((resolve, reject) => {
+            const r = new XMLHttpRequest();
+
+            r.onload = () => {
+                if(r.readyState === 4 && r.status === 200){
+                    resolve(r.responseText)
+                }
+            }
+
+            r.onerror = (e) => {
+
+            }
+
+            r.setRequestHeader('page-type', 'modal');
+            r.open("GET", url);
+
+            r.send();
+        })
+
+    }
 }
 
-var api = new Api();
+var Api = new ApiService();
 function Tags(elementId) {
     var rootElement = null;
     if (typeof elementId === 'string') {
@@ -690,7 +712,7 @@ function MAutoSuggestion(elementId, options) {
             this.render([]);
             return;
         }
-        api.get('/suggestion/' + window.encodeURIComponent(value)).then((data) => {
+        Api.get('/suggestion/' + window.encodeURIComponent(value)).then((data) => {
             console.log(data);
             this.render(data);
         });

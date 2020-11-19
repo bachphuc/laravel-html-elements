@@ -2,7 +2,7 @@
 @section('content')
 <div class="container-fluid">
 	<div class="row">
-		<div class="col-md-10">
+		<div class="col-md-{{is_modal_request() ? '12' : '10'}}">
 			@if (count($errors) > 0)
 			<div class="alert alert-danger">
 				<ul>

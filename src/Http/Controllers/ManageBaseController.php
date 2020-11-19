@@ -297,6 +297,11 @@ class ManageBaseController extends BaseController
         $this->processTable($table);
         
         $this->createModelUrl = $this->resolveItemUrl(null, 'create', $this->routeParams);
+
+        if($request->header('page-type') == 'table-content'){
+            $table->setAttribute('render_only_content', true);
+            return $table->render();
+        }
         
         return view($this->getView('index'), [
             "items" => $items,
@@ -329,6 +334,10 @@ class ManageBaseController extends BaseController
     }
 
     public function getLayout(){
+        $pageType = request()->header('page-type');
+        if($pageType == 'modal'){
+            return 'bachphuc.elements::layouts.blank';
+        }
         return $this->layout;
     }
 

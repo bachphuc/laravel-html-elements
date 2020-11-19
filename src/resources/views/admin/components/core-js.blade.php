@@ -140,4 +140,72 @@
             }
         });
     }
+
+    window.addEventListener('popstate', (event) => {
+        console.log(`onpopstate location: ${document.location}, state: ${JSON.stringify(event.state)}`);
+        renderPage(event.state);
+    });
+
+    window.addEventListener('load', () => {
+        window.originalUrl = window.location.href;
+        document.querySelectorAll('.fast-link').forEach(a => {
+            a.addEventListener('click', fastLinkClicked);
+        })
+
+        $('#page-modal').on('hidden.bs.modal', () => {
+            history.back();
+        })
+    });
+    
+    function hidePageModal(){
+        $('#page-modal').modal('hide');
+    }
+
+    function renderPage(state){
+        if(state === null){
+            hidePageModal();
+            return;
+        }
+        const href = state.href;
+        if(state.type === 'modal'){
+            try {
+                Api.fetchPage(href).then((html) => {
+                    $('#page-modal-title').text('');
+                    $('#page-modal-content').html(html);
+                    $.material.init();
+                    $('#page-modal').modal('show');
+                })
+            } catch (error) {
+                console.log(error)
+            }
+        }
+        else if(window.originalUrl === href){
+            // original URL
+            hidePageModal();
+        }
+        else{
+            window.location.href = href;
+        }
+    }
+
+    function navigatePage(href){
+        const state = {href: href, type: 'modal'};
+        history.pushState(state, "", href);
+        renderPage(state)
+    }
+
+    function fastLinkClicked(event){
+        if(window.innerWidth < 960) return true;
+        try{
+            const href = event.target.tagName.toLowerCase() === 'a' ? event.target.href : event.target.closest('a').href;
+            console.log(`fast link click: ${href}`)
+            navigatePage(href)
+        }
+        catch(err){
+            console.log(err);
+        }
+        event.preventDefault();
+        event.stopPropagation();
+        return false;
+    }
 </script>

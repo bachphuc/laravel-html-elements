@@ -4,6 +4,7 @@ namespace bachphuc\LaravelHTMLElements\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Schema;
+use Blade;
 
 use bachphuc\LaravelHTMLElements\Commands\ManageCommand;
 
@@ -64,5 +65,13 @@ class PackageServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(
             $packagePath . DIRECTORY_SEPARATOR . 'Config' . DIRECTORY_SEPARATOR . 'elements.php' , 'elements'
         );
+
+        $this->app->bind('html_element', function(){
+            return new \bachphuc\LaravelHTMLElements\Element();
+        });
+
+        Blade::directive('element', function($expression){
+            return "<?php echo \bachphuc\LaravelHTMLElements\Facades\ElementFacade::make($expression);?>";
+        });
     }
 }
