@@ -37,7 +37,7 @@ class PackageServiceProvider extends ServiceProvider
         ], 'elements-lang');
 
         // register view
-        $this->loadViewsFrom($packagePath . '/resources/views', 'bachphuc.elements');
+        $this->loadViewsFrom($packagePath . '/resources/views', 'elements');
 
         $this->publishes([
             $packagePath . '/resources/views' => resource_path('views/vendor/elements'),

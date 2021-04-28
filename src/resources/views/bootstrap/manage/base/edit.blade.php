@@ -1,5 +1,5 @@
 @extends($layout)
-@section('content')
+@section(isset($sectionName) ? $sectionName : 'content')
 <div class="container-fluid">
 	<div class="row">
 		<div class="col-md-{{is_modal_request() ? '12' : '10'}}">
@@ -14,7 +14,7 @@
 			@endif
 			<div class="card {{count($forms) > 1 ? 'card-nav-tabs' : ''}}">
 				<div class="card-header" data-background-color="purple">
-                    <h4 class="title">@lang('lang.edit_item', ['name' => $modelName ? $modelName : $model])</h4>
+                    <h4 class="title">@lang('elements::lang.edit_item', ['name' => $modelName ? $modelName : $model])</h4>
 					<p class="category"><a href="{{$self->resolveItemUrl($item, 'edit')}}">#{{$item->id}} {{$self->resolveItemAction($item, 'title')}}</a> </p>
 					
 					@if(count($forms) > 1)

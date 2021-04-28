@@ -75,20 +75,20 @@
                     <th>{{str_title_from_array($field, $k)}}</th>
                     @endforeach
                     @if($isShowActionButtons)
-                    <th>Action</th>
+                    <th>@lang('elements::lang.action')</th>
                     @endif
                 </tr>
             </thead>
             <tbody>
                 @foreach($items as $item)
-                @include('bachphuc.elements::bootstrap.elements.table-row')
+                @include('elements::bootstrap.elements.table-row')
                 @endforeach
             </tbody>
         </table>
 
         @if(!$totalItem)
         <div style="margin-top: 20px;">
-            <div class="alert alert-warning">There's no item found.</div>
+            <div class="alert alert-warning">@lang('elements::lang.no_items_found')</div>
         </div>
         @endif
 
@@ -110,9 +110,17 @@
         else if(window.$ && typeof ($().modal) === 'function'){
             bHasModalPlugin = true;
         }
+        
+        if(bHasModalPlugin){
+            const modal = document.getElementById('deleteConfirmModal');
+            if(!modal){
+                console.warn("WARNING: ADD: @\stack('modals') to layout");
+                bHasModalPlugin = false;
+            }
+        }
 
         if(!bHasModalPlugin){
-            let r = window.confirm('@lang('lang.delete_confirm_message')');
+            let r = window.confirm('@lang('elements::lang.delete_confirm_message')');
             if(r === true){
                 deleteItem();
             }

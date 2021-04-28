@@ -10,7 +10,7 @@
 @endphp
 <form {!! $submitFunction !!} {!! isset($onsubmit) && !empty($onsubmit) ? ' onsubmit="' . $onsubmit . '" ' : '' !!} method="POST" action="{{isset($action) ? $action : ''}}" {{isset($has_file) && $has_file ? 'enctype=multipart/form-data' : ''}}>
     <input type="hidden" name="_token" value="{{ csrf_token() }}" />
-    @include('bachphuc.elements::'. $theme . '.manage.base.message')
+    @include('elements::'. $theme . '.manage.base.message')
     @php
         $method = isset($method) ? $method : 'POST';
     @endphp

@@ -21,4 +21,8 @@ class TextEditor extends BaseElement
         $this->setAttribute('title', title_case($this->getTitle()));
         return parent::render($params);
     }
+
+    public static function assetViewPath(){
+        return 'elements::assets.tinymce';
+    }
 }

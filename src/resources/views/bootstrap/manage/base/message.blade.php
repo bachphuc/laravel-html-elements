@@ -4,22 +4,22 @@
 
     @if(session()->has('message'))
     <div class="alert alert-success" role="alert">
-        <i class="material-icons">check</i> {{session('message')}}
+        ✅ {{session('message')}}
     </div>
     @endif
     @if(isset($message) && !empty($message))
     <div class="alert alert-success" role="alert">
-        <i class="material-icons">check</i> {{$message}}
+        ✅ {{$message}}
     </div>
     @endif
     @if(session()->has('error'))
     <div class="alert alert-danger" role="alert">
-        <i class="material-icons">error</i> {{session('error')}}
+        ❌ {{session('error')}}
     </div>
     @endif
     @if(session()->has('warning'))
     <div class="alert alert-warning" role="alert">
-        <i class="material-icons">warning</i> {{session('warning')}}
+        ⚠️ {{session('warning')}}
     </div>
     @endif
 

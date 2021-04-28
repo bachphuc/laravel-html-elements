@@ -31,7 +31,7 @@ class ManageBaseController extends BaseController
 
     protected $form;
     protected $forms;
-    protected $fields;
+    protected $fields = [];
     protected $modelClass;
     protected $searchFields;
 
@@ -56,7 +56,7 @@ class ManageBaseController extends BaseController
     protected $authMiddleware = '';
 
     protected $rootRoute = '';
-    protected $layout = 'bachphuc.elements::layouts.admin';
+    protected $layout = 'elements::layouts.admin';
 
     protected $isShowCreateButton = true;
 
@@ -67,6 +67,7 @@ class ManageBaseController extends BaseController
 
     protected $mapModelClasses = [];
     protected $colorTheme = 'white';
+    protected $sectionName = 'content';
 
     public function __construct(){
         $this->loadConfig($this->pageConfig);
@@ -303,22 +304,36 @@ class ManageBaseController extends BaseController
             return $table->render();
         }
         
-        return view($this->getView('index'), [
+        return $this->view('index', [
             "items" => $items,
-            "model" => $this->model,
-            "modelName" => $this->modelName,
             "params" => $this->queryParams,
             "table" => $table,
-            'breadcrumbs' => $this->getBreadcrumbs(),
-            'rootRoute' => $this->rootRoute,
             'createModelUrl' => $this->createModelUrl,
             'isShowCreateButton' => $this->isShowCreateButton,
-            'layout' => $this->getLayout(),
             'searchFields' => $this->searchFields,
+        ]);
+    }
+
+    public function view($path, $params = []){
+        $default = [
             'menus' => $this->getMenus(),
             'activeMenu' => $this->activeMenu,
             'colorTheme' => $this->getColorTheme(),
-        ]);
+            'sectionName' => $this->sectionName,
+            'layout' => $this->getLayout(),
+            'breadcrumbs' => $this->getBreadcrumbs(),
+            'rootRoute' => $this->rootRoute,
+            "model" => $this->model,
+            "modelName" => $this->modelName,
+            'self' => $this,
+            'pageTitles' => $this->getPageTitles()
+        ];
+
+        return view($this->getView($path), array_merge($default, $params));
+    }
+
+    public function getPageTitles(){
+        return null;
     }
 
     public function getMenus(){
@@ -336,7 +351,7 @@ class ManageBaseController extends BaseController
     public function getLayout(){
         $pageType = request()->header('page-type');
         if($pageType == 'modal'){
-            return 'bachphuc.elements::layouts.blank';
+            return 'elements::layouts.blank';
         }
         return $this->layout;
     }
@@ -374,15 +389,8 @@ class ManageBaseController extends BaseController
             'url' => ''
         ];
 
-        return view($this->getView('create'), [
-            "modelName" => $this->modelName,
+        return $this->view('create', [
             "form" => $this->form,
-            'breadcrumbs' => $this->getBreadcrumbs(),
-            'layout' => $this->getLayout(),
-            'model' => $this->model,
-            'activeMenu' => $this->activeMenu,
-            'menus' => $this->getMenus(),
-            'colorTheme' => $this->getColorTheme(),
         ]);
     }
 
@@ -549,25 +557,15 @@ class ManageBaseController extends BaseController
 
         $this->editHook($item);
 
-        return view($this->getView('edit') , [
-            "modelName" => $this->modelName,
+        return $this->view('edit' , [
             "item" => $item,
             "forms" => $this->forms,
-            'breadcrumbs' => $this->getBreadcrumbs(),
-            'self' => $this,
-            'layout' => $this->getLayout(),
-            'model' => $this->model,
-            'menus' => $this->getMenus(),
-            'activeMenu' => $this->activeMenu,
             'disableGlobalMessage' => true,
-            'menus' => $this->getMenus(),
-            'colorTheme' => $this->getColorTheme(),
         ]);
     }
 
     public function baseView($path, $data = []){
         $coreData = [
-            'self' => $this,
             'layout' => $this->getLayout(),
             'menus' => $this->getMenus(),
             'activeMenu' => $this->activeMenu

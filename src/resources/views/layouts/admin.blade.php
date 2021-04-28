@@ -13,7 +13,7 @@
     <!-- Styles -->
     {{-- <link href="{{ asset('css/app.css') }}" rel="stylesheet"> --}}
 
-    @include('bachphuc.elements::admin.components.css-headers')
+    @include('elements::admin.components.css-headers')
 
     <script type="text/javascript" src="{{asset('vendor/elements/admin/js/components.js')}}"></script>
 
@@ -56,7 +56,7 @@
 			
 	    	<div class="sidebar-wrapper">
                 <div class="fake-scroller">
-                    @include('bachphuc.elements::admin.components.navigation-menus')
+                    @include('elements::admin.components.navigation-menus')
                 </div>
 	    	</div>
 	    </div>
@@ -72,7 +72,7 @@
 							<span class="icon-bar"></span>
 							<span class="icon-bar"></span>
 						</button>
-						<a class="navbar-brand" href="#">@lang('lang.dashboard')</a>
+						<a class="navbar-brand" href="#">@lang('elements::lang.dashboard')</a>
 					</div>
 					<div class="collapse navbar-collapse">
 						<ul class="nav navbar-nav navbar-right">
@@ -110,7 +110,7 @@
 			</nav>
 
 			<div class="content">
-                @include('bachphuc.elements::admin.components.breadcrumbs')
+                @include('elements::admin.components.breadcrumbs')
 				@if (isset($message))
 				<div class="alert alert-success">{{ $message }}</div>  
 				@endif
@@ -144,7 +144,7 @@
     {{-- <script src="{{ asset('js/app.js') }}"></script> --}}
 
     <!--   Core JS Files   -->
-	@include('bachphuc.elements::admin.components.core-js')
+	@include('elements::admin.components.core-js')
     <!-- Modal -->
     
     <!-- modals components -->

@@ -6,7 +6,7 @@
             @endphp
             <label class="control-label">{{isset($title) ? $title : ''}}</label>
             <div class="mt20">
-                <textarea class="tinymce-editor" name="{{isset($name) ? $name : ''}}" {{in_array('required', $validators) ? 'required' : ''}} placeholder="{{isset($placeholder) ? $placeholder : ''}}">{{isset($value) ? $value : ''}}</textarea>
+                <textarea {!! isset($id) ? 'id="' . $id . '"' : '' !!} class="tinymce-editor" name="{{isset($name) ? $name : ''}}" {{in_array('required', $validators) ? 'required' : ''}} placeholder="{{isset($placeholder) ? $placeholder : ''}}">{{isset($value) ? $value : ''}}</textarea>
             </div>
         </div>
     </div>

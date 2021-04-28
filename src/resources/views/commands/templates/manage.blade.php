@@ -22,7 +22,7 @@ class {{$className}} extends ManageBaseController{
     @isset($layout)
     @if($layout === 'admin')
 
-    protected $layout = 'bachphuc.elements::layouts.admin';
+    protected $layout = 'elements::layouts.admin';
 
     @else
 

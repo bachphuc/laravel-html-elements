@@ -1,5 +1,5 @@
 @extends($layout)
-@section('content')
+@section(isset($sectionName) ? $sectionName : 'content')
 <div class="container-fluid">
 	<div class="row">
 		<div class="col-md-{{is_modal_request() ? '12' : '10'}}">

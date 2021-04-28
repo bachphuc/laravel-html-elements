@@ -1,20 +1,23 @@
 @extends($layout) 
-@section('content')
+@section(isset($sectionName) ? $sectionName : 'content')
 @php
     $isShowCreateButton = isset($isShowCreateButton)? $isShowCreateButton : true;
     $createUrl = isset($createModelUrl) ? $createModelUrl : null;
-
+    $title = isset($pageTitles) && isset($pageTitles['index']) ? $pageTitles['index'] : ucfirst(str_plural($modelName ? $modelName : $model));
 @endphp
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header" data-background-color="purple">
-                    <h4 class="title">{{ucfirst(str_plural($modelName ? $modelName : $model))}}</h4>
+                    <h4 class="title">{{$title}}</h4>
                     <div class="row">
                         @if($isShowCreateButton || isset($renderActionButtons))
-                        <div class="col-md-8 action-buttons-panel">
+                        <div class="col-md-8 {{isset($renderActionButtons) ? 'action-buttons-panel' : ''}}">
+                            @if(isset($renderActionButtons))
                             <button class="btn btn-trans" onclick="toggleActionsPanel(this)">Show Actions <i class="material-icons">&#xE313;</i></button>
+                            @endif
+
                             @if(isset($isShowCreateButton))
                             <a class="btn btn-success fast-link" href="{{$createUrl}}">@lang('elements::lang.create_new_item', ['name' => strtolower($modelName ? $modelName : $model)])</a>
                             @endif

@@ -113,7 +113,7 @@ class ManageCommand extends Command{
             $params['route_name'] = str_plural($params['model']);
         }
 
-        $view = view('bachphuc.elements::commands.templates.manage', $params);
+        $view = view('elements::commands.templates.manage', $params);
         $content = $view->render();
         
         $content = preg_replace('/^[\n\r\s]+$/m', '' , $content);

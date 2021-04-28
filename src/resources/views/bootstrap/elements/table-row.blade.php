@@ -55,7 +55,11 @@
         <div class="td-actions text-right">
             @if($isShowDeleteButton)
             <a rel="tooltip" title="Delete Item" class="btn btn-danger btn-simple btn-xs" data-toggle="modal" data-target="#deleteConfirmModal" onclick="onDeleteItem({{$item->id}})">
+                @if(isset($deleteIcon))
+                {!! $deleteIcon !!}
+                @else
                 <i class="material-icons">close</i>
+                @endif
             </a>
 
             <form id="form-{{$item->id}}" action="{{ $self->handleUrl($item, 'destroy') }}" method="POST" style="display: none;">
@@ -65,7 +69,11 @@
 
             @if($isShowEditButton)
             <a rel="tooltip" title="Edit Item" class="btn btn-primary btn-simple btn-xs fast-link" href="{{$self->handleUrl($item, 'edit')}}">
+                @if(isset($editIcon))
+                {!! $editIcon !!}
+                @else
                 <i class="material-icons">edit</i>
+                @endif
             </a>
             @endif
 

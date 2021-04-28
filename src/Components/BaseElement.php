@@ -6,9 +6,9 @@ use bachphuc\LaravelHTMLElements\Facades\ElementFacade as Element;
 
 class BaseElement
 {
-    const VIEW_BASE_PATH = 'bachphuc.elements';
+    const VIEW_BASE_PATH = 'elements';
     // module
-    protected $baseViewPath = 'bachphuc.elements';
+    protected $baseViewPath = 'elements';
     // folder path
     protected $folderPath = '';
     // view name
@@ -28,8 +28,10 @@ class BaseElement
     protected $defaultAttributes = [];
     protected $viewData = [];
 
-    function __construct() {
-        
+    function __construct($attrs = []) {
+        if(!empty($attrs)){
+            $this->setAttributes($attrs);
+        }
     }
 
     public function getType(){
