@@ -49,55 +49,6 @@
         return retval;
     }
 
-    document.addEventListener("DOMContentLoaded", function(){
-        tinymce.init({ 
-            selector:'.tinymce-editor' , 
-            min_height : 350,
-            plugins : [
-                'textcolor colorpicker link image'
-            ],
-            relative_urls : false,
-            remove_script_host : false,
-            convert_urls : true,
-            toolbar1: 'undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | forecolor backcolor | link image',
-            file_picker_callback: function(callback, value, meta) {
-                // Provide image and alt text for the image dialog
-                if (meta.filetype == 'image') {
-                    // callback('myimage.jpg', {alt: 'My alt text'});
-                    $('#image_upload').click();
-                    $('#image_upload').on('change', function(){
-                        var fd = new FormData($('#upload-image-form')[0]);
-
-                        var option = {
-                            url: '{{url('image/upload')}}',
-                            type: "POST",
-                            data: fd,
-                            processData: false,
-                            contentType: false,
-                        };
-
-                        var ajaxRequest = $.ajax(option).done(function (data) {
-                            if(data.status && data.image){
-                                callback(data.image, data.name);
-                            }
-                            else{
-                                alert('Cannot upload file.');
-                            }
-                        }).fail(function (data) {
-                            console.log(data);
-                        });
-                    });
-                }
-            }
-        });
-
-        $.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
-        });
-    });
-
     $(document).ready(function(){
         // Javascript method's body can be found in assets/js/demos.js
         $('.datetimepicker').datetimepicker({

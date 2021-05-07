@@ -12,17 +12,17 @@
     <div class="modal-dialog modal-primary" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">@lang('lang.delete_confirm')</h5>
+                <h5 class="modal-title" id="exampleModalLabel">@lang('elements::lang.delete_confirm')</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <p>{{isset($deleteMessage) ? $deleteMessage : trans('lang.delete_confirm_message')}}</p>
+                <p>{{isset($deleteMessage) ? $deleteMessage : trans('elements::lang.delete_confirm_message')}}</p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">@lang('lang.close')</button>
-                <button type="button" class="btn btn-danger" onclick="deleteItem()">@lang('lang.delete')</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">@lang('elements::lang.close')</button>
+                <button type="button" class="btn btn-danger" onclick="deleteItem()">@lang('elements::lang.delete')</button>
             </div>
             <div class="modal-loading"><i class="fa fa-spinner fa-spin fa-3x fa-fw"></i> <span>@lang('lang.processing')...</span></div>
         </div>

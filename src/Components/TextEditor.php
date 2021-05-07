@@ -4,6 +4,7 @@ namespace bachphuc\LaravelHTMLElements\Components;
 class TextEditor extends BaseElement
 {   
     protected $viewPath = 'text-editor';
+    protected $requiredAssetViewPath = 'text-editor-asset';
 
     public function getTitle(){
         $title = $this->getAttribute('title');

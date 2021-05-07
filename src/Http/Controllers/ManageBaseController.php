@@ -528,6 +528,7 @@ class ManageBaseController extends BaseController
         $this->forms = [];
         $this->init();
         $this->initFormInput(true);
+        $this->form->setAttribute('isUpdate', true);
         $item = $this->getItem($this->getId($id));
 
         $this->initBreadcrumb();

@@ -5,7 +5,7 @@
     $createUrl = isset($createModelUrl) ? $createModelUrl : null;
     $title = isset($pageTitles) && isset($pageTitles['index']) ? $pageTitles['index'] : ucfirst(str_plural($modelName ? $modelName : $model));
 @endphp
-<div class="container-fluid">
+<div class="container-fluid manage-page-index">
     <div class="row">
         <div class="col-md-12">
             <div class="card">

@@ -9,4 +9,9 @@ return [
     'edit_item' => 'Edit item',
     'action' => 'Action',
     'no_items_found' => "There's no item found.",
+    'select' => 'Select',
+    'submit' => 'Submit',
+    'cancel' => 'Cancel',
+    'action_complete' => 'Action completed.',
+    'update' => 'Update',
 ];

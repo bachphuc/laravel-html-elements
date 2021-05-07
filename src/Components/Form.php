@@ -16,6 +16,7 @@ class Form extends BaseElement
     protected $specialFields = ['user', 'alias'];
     protected $defaultThumbnailSizes = [120, 300, 500];
     protected $item = null;
+    protected $requiredAssets = [];
 
     public function setItem($item){
         $this->item = $item;
@@ -28,6 +29,14 @@ class Form extends BaseElement
 
     public function hasFile($b){
         $this->setAttribute('has_file', $b);
+    }
+
+    public function addRequiredAssetView($path){
+        if(empty($path)) return false;
+        if(in_array($path, $this->requiredAssets)) return false;
+
+        $this->requiredAssets[] = $path;
+        return true;
     }
 
     /**
@@ -65,6 +74,9 @@ class Form extends BaseElement
             // special field
             if(!in_array($key, $this->specialFields) || $bContinue){
                 $element = $this->createElement($k, $tmp);
+                if($element->hasRequiredAssetViewPath()){
+                    $this->addRequiredAssetView($element->getRequiredAssetViewPath());
+                }
                 $name = $element->getName();
                 if(!empty($name)){
                     $this->elements[$name] = $element;
@@ -98,6 +110,7 @@ class Form extends BaseElement
     public function render($params = []){
         $params['data'] = $this->data;
         $params['elements'] = $this->elements;
+        $params['requiredAssets'] = $this->requiredAssets;
         return parent::render($params);
     }
 

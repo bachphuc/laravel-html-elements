@@ -16,7 +16,7 @@ class BaseElement
     protected $fullViewPath = '';
     protected $attributes = [];
     protected $item = null;
-    protected $theme = 'default';
+    protected $theme = 'bootstrap';
     protected $module = '';
     protected $name = '';
     protected $_data = null;
@@ -27,11 +27,26 @@ class BaseElement
 
     protected $defaultAttributes = [];
     protected $viewData = [];
+    protected $requiredAssetViewPath = null;
 
     function __construct($attrs = []) {
         if(!empty($attrs)){
             $this->setAttributes($attrs);
         }
+    }
+
+    protected function hasRequiredAssetViewPath(){
+        return empty($this->requiredAssetViewPath) ? false : true;
+    }
+
+    protected function getRequiredAssetViewPath(){
+        if(!empty($this->module)){
+            return $this->module . '::elements.'. $this->theme . '.' . $this->requiredAssetViewPath;
+        }
+        if(!empty($this->folderPath)){
+            return $this->baseViewPath. '::' . $this->folderPath . '.'  . $this->theme. '.elements'  . '.' . $this->requiredAssetViewPath;
+        }
+        return $this->baseViewPath. '::'. $this->theme. '.elements'  . '.' . $this->requiredAssetViewPath;
     }
 
     public function getType(){

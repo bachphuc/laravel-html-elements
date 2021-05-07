@@ -94,4 +94,21 @@ class Element
 
         return false;
     }
+
+    public function trans($key, $default = ''){
+        if(\Lang::has($key)) return trans($key);
+
+        if(\Lang::has('elements::' . $key)) return trans('elements::' . $key);
+
+        if(!empty($default)) return $default;
+
+        return $key;
+    }
+
+    public function viewPath($path, $theme = ''){
+        if(!empty($theme)){
+            return 'elements::' . $theme . '.' . $path;
+        }
+        return 'elements::' . $this->theme . '.' . $path;
+    }
 }

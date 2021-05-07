@@ -1,6 +1,6 @@
 @extends($layout)
 @section(isset($sectionName) ? $sectionName : 'content')
-<div class="container-fluid">
+<div class="container-fluid manage-page-edit">
 	<div class="row">
 		<div class="col-md-{{is_modal_request() ? '12' : '10'}}">
 			@if (count($errors) > 0)

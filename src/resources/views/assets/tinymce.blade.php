@@ -43,6 +43,17 @@
     document.addEventListener("DOMContentLoaded", () => {
         if(typeof tinymce === 'undefined') return log('no tinymce detect');
         console.log('init tinymce');
+        // create a image form
+        const imageForm = document.createElement('form');
+        imageForm.id = 'upload-image-form';
+        imageForm.method = 'POST';
+        imageForm.enctype = 'multipart/form-data';
+        const imageFile = document.createElement('input');
+        imageFile.type = 'file';
+        imageFile.name = 'files[]';
+        imageFile.id = 'image_upload';
+        imageForm.appendChild(imageFile);
+        document.body.appendChild(imageForm);
         tinymce.init({
             selector: '#{{isset($elementId) ? $elementId : 'mytextarea'}}',
             plugins: 'paste',
@@ -51,6 +62,46 @@
                 if(args && args.content){
                     args.content = cleanHTML(args.content);
                 }
+            },
+            plugins : [
+                'textcolor colorpicker link image'
+            ],
+            relative_urls: false,
+            toolbar1: 'undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | forecolor backcolor | link image',
+            file_picker_callback: function(callback, value, meta) {
+                // Provide image and alt text for the image dialog
+                if (meta.filetype === 'image') {
+                    $('#image_upload').click();
+                    console.log(`image_upload clicked`);
+                    $('#image_upload').on('change', function(){
+                        var fd = new FormData($('#upload-image-form')[0]);
+
+                        var option = {
+                            url: '{{isset($uploadPath) ? $uploadPath : url('image/upload')}}',
+                            type: "POST",
+                            data: fd,
+                            processData: false,
+                            contentType: false,
+                        };
+
+                        var ajaxRequest = $.ajax(option).done(function (data) {
+                            if(data.status && data.image){
+                                callback(data.image, data.name);
+                            }
+                            else{
+                                alert('Cannot upload file.');
+                            }
+                        }).fail(function (data) {
+                            console.log(data);
+                        });
+                    });
+                }
+            }
+        });
+
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
         });
     })

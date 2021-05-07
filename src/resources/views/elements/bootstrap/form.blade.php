@@ -13,9 +13,9 @@
         @if(isset($renderActionButtons) && $renderActionButtons && is_callable($renderActionButtons))
             {!! $renderActionButtons(isset($item) ? $item : null) !!}
         @endif
-        <button type="submit" class="btn btn-primary pull-right">Submit</button>
+        <button type="submit" class="btn btn-primary pull-right">{{element_trans('lang.submit')}}</button>
         @if(isset($cancelUrl) && !empty($cancelUrl))
-        <a href="{{$cancelUrl}}" class="btn pull-right">Cancel</a>
+        <a href="{{$cancelUrl}}" class="btn pull-right">{{element_trans('lang.cancel')}}</a>
         @endif
     </div>
     <div class="clearfix"></div>

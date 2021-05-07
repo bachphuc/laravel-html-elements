@@ -1,5 +1,6 @@
 @php
     $rowAttribute = '';
+    $disableEditModalMode = isset($disableEditModalMode) ? $disableEditModalMode : false;
     if(isset($rowAttributeRender)){
         $rowAttribute = $rowAttributeRender($item);
     }
@@ -54,7 +55,7 @@
     <td>
         <div class="td-actions text-right">
             @if($isShowDeleteButton)
-            <a rel="tooltip" title="Delete Item" class="btn btn-danger btn-simple btn-xs" data-toggle="modal" data-target="#deleteConfirmModal" onclick="onDeleteItem({{$item->id}})">
+            <a rel="tooltip" title="Delete Item" class="btn btn-danger btn-simple btn-xs btn-sm" data-toggle="modal" data-target="#deleteConfirmModal" onclick="onDeleteItem({{$item->id}})">
                 @if(isset($deleteIcon))
                 {!! $deleteIcon !!}
                 @else
@@ -68,7 +69,7 @@
             @endif
 
             @if($isShowEditButton)
-            <a rel="tooltip" title="Edit Item" class="btn btn-primary btn-simple btn-xs fast-link" href="{{$self->handleUrl($item, 'edit')}}">
+            <a rel="tooltip" title="Edit Item" class="btn btn-primary btn-simple btn-xs {{!$disableEditModalMode ? 'fast-link' : ''}} btn-sm" href="{{$self->handleUrl($item, 'edit')}}">
                 @if(isset($editIcon))
                 {!! $editIcon !!}
                 @else
@@ -88,9 +89,9 @@
                     {!! $action['render']($item) !!}
                     @else
                         @if(isset($action['route']))
-                        <a  rel="tooltip" title="{{isset($action['tooltip']) ? $action['tooltip'] : ''}}" class="btn btn-simple btn-xs btn-{{$actionType}}" href="{{route($action['route'] , ['id' => $item->id])}}">{!! $action['title'] !!}</a>
+                        <a  rel="tooltip" title="{{isset($action['tooltip']) ? $action['tooltip'] : ''}}" class="btn btn-sm btn-simple btn-xs btn-{{$actionType}}" href="{{route($action['route'] , ['id' => $item->id])}}">{!! $action['title'] !!}</a>
                         @elseif(isset($action['url']))
-                        <a  rel="tooltip" title="{{isset($action['tooltip']) ? $action['tooltip'] : ''}}" class="btn btn-simple btn-xs btn-{{$actionType}}" href="{{$action['url']}}">{!! $action['title'] !!}</a>
+                        <a  rel="tooltip" title="{{isset($action['tooltip']) ? $action['tooltip'] : ''}}" class="btn btn-sm btn-simple btn-xs btn-{{$actionType}}" href="{{$action['url']}}">{!! $action['title'] !!}</a>
                         @endif
                     @endif
                 @endif
