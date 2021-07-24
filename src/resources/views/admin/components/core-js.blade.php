@@ -124,6 +124,9 @@
                     $('#page-modal-title').text('');
                     $('#page-modal-content').html(html);
                     $.material.init();
+                    if(typeof loadTinymce === 'function'){
+                        loadTinymce();
+                    }
                     $('#page-modal').modal('show');
                 })
             } catch (error) {

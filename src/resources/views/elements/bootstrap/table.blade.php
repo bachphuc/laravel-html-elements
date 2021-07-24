@@ -53,7 +53,7 @@
             </div>
             @endforeach
             <div class="col col-md-2">
-                <button type="submit" class="btn btn-primary">@lang('lang.submit')</button>
+                <button type="submit" class="btn btn-primary">@lang('elements::lang.submit')</button>
             </div>
         </div>
     </form>

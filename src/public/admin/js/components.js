@@ -23,8 +23,8 @@ function ApiService() {
 
             }
 
-            r.setRequestHeader('page-type', 'modal');
             r.open("GET", url);
+            r.setRequestHeader('page-type', 'modal');
 
             r.send();
         })
@@ -727,7 +727,8 @@ function MAutoSuggestion(elementId, options) {
 
 var tags = {};
 var singleTags = {};
-document.addEventListener("DOMContentLoaded", function () {
+function loadElements(){
+    console.log(`loadElements`);
     // init tags input
     document.querySelectorAll('div[tags]').forEach((e) => {
         var t = new Tags(e);
@@ -751,6 +752,10 @@ document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll('[autosuggestion]').forEach(e => {
         var t = new MAutoSuggestion(e);
     });
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    loadElements();
 });
 
 var mPlayer = null;

@@ -14,4 +14,9 @@ return [
     'cancel' => 'Cancel',
     'action_complete' => 'Action completed.',
     'update' => 'Update',
+    'delete_confirm' => 'Delete Confirm',
+    'close' => 'Close',
+    'delete' => 'Delete',
+    'processing' => 'Processing',
+    'submit' => 'Submit',
 ];

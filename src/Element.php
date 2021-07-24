@@ -52,7 +52,7 @@ class Element
         if($ele) {
             return $ele->render();
         }
-        return '<h1>'. $type . ' is not implemented.</h1>';
+        return '<!-- '. $type . ' is not implemented. -->';
     }
 
     public function version(){
